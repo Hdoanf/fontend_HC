@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/home/mobile/bottom_nav_bar.dart';
+import 'bottom_nav_bar.dart';
 
 class MobileShellPage extends StatelessWidget {
   final Widget child;
 
-  const MobileShellPage({
-    super.key,
-    required this.child,
-  });
+  const MobileShellPage({super.key, required this.child});
 
   int _locationToIndex(String location) {
     if (location.startsWith('/devices')) return 1;

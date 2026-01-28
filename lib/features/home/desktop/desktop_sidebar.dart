@@ -4,10 +4,7 @@ import 'package:go_router/go_router.dart';
 class DesktopSidebar extends StatelessWidget {
   final String currentRoute;
 
-  const DesktopSidebar({
-    super.key,
-    required this.currentRoute,
-  });
+  const DesktopSidebar({super.key, required this.currentRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +23,7 @@ class DesktopSidebar extends StatelessWidget {
                 SizedBox(width: 8),
                 Text(
                   'SmartHome',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -87,6 +81,7 @@ class DesktopSidebar extends StatelessWidget {
     );
   }
 }
+
 class _SidebarItem extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -113,10 +108,7 @@ class _SidebarItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: isActive ? Colors.blue : Colors.grey,
-            ),
+            Icon(icon, color: isActive ? Colors.blue : Colors.grey),
             const SizedBox(width: 12),
             Text(
               label,

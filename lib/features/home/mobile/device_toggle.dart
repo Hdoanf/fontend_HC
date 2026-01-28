@@ -2,16 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:thuctap/core/constants/app_colors.dart';
 import 'package:thuctap/core/constants/app_sizes.dart';
 
-
 class DeviceToggle extends StatefulWidget {
   final bool isOn;
   final ValueChanged<bool> onChanged;
 
-  const DeviceToggle({
-    Key? key,
-    required this.isOn,
-    required this.onChanged,
-  }) : super(key: key);
+  const DeviceToggle({super.key, required this.isOn, required this.onChanged});
 
   @override
   State<DeviceToggle> createState() => _DeviceToggleState();
@@ -39,7 +34,9 @@ class _DeviceToggleState extends State<DeviceToggle> {
         width: 56,
         height: 32,
         decoration: BoxDecoration(
-          color: _isOn ? const Color.fromARGB(255, 4, 65, 186) : AppColors.disabled,
+          color: _isOn
+              ? const Color.fromARGB(255, 4, 65, 186)
+              : AppColors.disabled,
           borderRadius: BorderRadius.circular(AppSizes.radiusXLarge),
         ),
         child: Stack(

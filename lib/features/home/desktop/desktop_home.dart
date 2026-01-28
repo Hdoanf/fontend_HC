@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:thuctap/features/home/desktop/desktop_rooms_section.dart';
-import 'package:thuctap/features/home/mobile/frequently_used_section.dart';
 import 'desktop_header.dart';
+import 'desktop_rooms_section.dart';
+import 'desktop_frequently_used.dart';
 
 class DesktopHome extends StatelessWidget {
   const DesktopHome({super.key});

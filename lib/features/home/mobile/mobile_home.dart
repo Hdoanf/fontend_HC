@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:thuctap/core/constants/app_colors.dart';
 import 'package:thuctap/core/constants/app_sizes.dart';
-import 'package:thuctap/features/auth/presentation/widgets/home/mobile/frequently_used_section.dart';
-import 'package:thuctap/features/auth/presentation/widgets/home/mobile/header_widget.dart';
-import 'package:thuctap/features/auth/presentation/widgets/home/mobile/rooms_section.dart';
-
+import 'package:thuctap/features/home/mobile/frequently_used_section.dart';
+import 'package:thuctap/features/home/mobile/header_widget.dart';
+import 'package:thuctap/features/home/mobile/rooms_section.dart';
 
 class MobileHomePage extends StatefulWidget {
   const MobileHomePage({Key? key}) : super(key: key);
@@ -30,10 +29,7 @@ class _MobileHomePageState extends State<MobileHomePage> {
               color: AppColors.surfaceGray,
               borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
             ),
-            child: Icon(
-              Icons.menu,
-              color: AppColors.textPrimary,
-            ),
+            child: Icon(Icons.menu, color: AppColors.textPrimary),
           ),
         ),
         actions: [

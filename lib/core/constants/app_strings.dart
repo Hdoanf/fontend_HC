@@ -6,18 +6,18 @@ class AppStrings {
   static const String addNew = 'Add New';
   static const String frequentlyUsed = 'Frequently Used';
   static const String seeAll = 'See All';
-  
+
   // Room names
   static const String bedRoom = 'Bed Room';
   static const String livingRoom = 'Living Room';
   static const String studyRoom = 'Study Room';
   static const String guestRoom = 'Guest Room';
-  
+
   // Room device count
   static const String fiveRooms = 'Five rooms';
   static const String twoRooms = 'Two rooms';
   static const String oneRoom = 'One room';
-  
+
   // Devices
   static const String airCondition = 'Air Condition';
   static const String ceilingFan = 'Ceiling Fan';

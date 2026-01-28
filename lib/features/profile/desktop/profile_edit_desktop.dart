@@ -18,10 +18,7 @@ class ProfileEditDesktop extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 20,
-              ),
+              BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20),
             ],
           ),
           child: Column(
@@ -85,7 +82,6 @@ class ProfileEditDesktop extends StatelessWidget {
       ],
     );
   }
-  
 
   Widget _form() {
     return Column(
@@ -117,17 +113,11 @@ class ProfileEditDesktop extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: OutlinedButton(
-            onPressed: () {},
-            child: const Text('Cancel'),
-          ),
+          child: OutlinedButton(onPressed: () {}, child: const Text('Cancel')),
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: AppButton(
-            text: 'Save',
-            onTap: () {},
-          ),
+          child: AppButton(text: 'Save', onTap: () {}),
         ),
       ],
     );

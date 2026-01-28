@@ -1,13 +1,13 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:thuctap/features/auth/presentation/pages/desktop_shell_page.dart';
-import 'package:thuctap/features/auth/presentation/widgets/profile/desktop/profile_edit_desktop.dart';
+import 'package:thuctap/features/home/desktop/desktop_shell_page.dart';
+import 'package:thuctap/features/profile/desktop/profile_edit_desktop.dart';
 
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_up_page.dart';
-import '../features/auth/presentation/pages/home_page.dart';
-import '../features/auth/presentation/pages/mobile_shell_page.dart';
-import '../features/auth/presentation/widgets/devices/mobile_devices_page.dart';
+import '../features/home/home_page.dart';
+import '../features/home/mobile/mobile_shell_page.dart';
+import '../features/home/devices/mobile_devices_page.dart';
 import '../shared/responsive/responsive_layout.dart';
 
 final GoRouter appRouter = GoRouter(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:thuctap/shared/responsive/responsive_layout.dart';
 
-import '../widgets/home/mobile/mobile_home.dart';
-import '../widgets/home/desktop/desktop_home.dart';
+import 'mobile/mobile_home.dart';
+import 'desktop/desktop_home.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

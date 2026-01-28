@@ -44,17 +44,8 @@ class _CircleIconButton extends StatelessWidget {
       child: Container(
         width: 48,
         height: 48,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: FaIcon(
-            icon,
-            size: 20,
-            color: iconColor,
-          ),
-        ),
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        child: Center(child: FaIcon(icon, size: 20, color: iconColor)),
       ),
     );
   }

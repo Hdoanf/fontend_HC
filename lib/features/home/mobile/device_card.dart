@@ -38,9 +38,7 @@ class _DeviceCardState extends State<DeviceCard> {
     return Container(
       padding: const EdgeInsets.all(AppSizes.paddingMedium),
       decoration: BoxDecoration(
-        color: active
-            ? AppColors.primary
-            : AppColors.cardBackground,
+        color: active ? AppColors.primary : AppColors.cardBackground,
         borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
       ),
       child: Row(
@@ -73,9 +71,7 @@ class _DeviceCardState extends State<DeviceCard> {
                   style: TextStyle(
                     fontSize: AppSizes.fontLarge,
                     fontWeight: FontWeight.w600,
-                    color: active
-                        ? Colors.white
-                        : AppColors.textPrimary,
+                    color: active ? Colors.white : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -83,9 +79,7 @@ class _DeviceCardState extends State<DeviceCard> {
                   widget.status,
                   style: TextStyle(
                     fontSize: AppSizes.fontSmall,
-                    color: active
-                        ? Colors.white70
-                        : AppColors.textSecondary,
+                    color: active ? Colors.white70 : AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -102,7 +96,7 @@ class _DeviceCardState extends State<DeviceCard> {
                     });
                   }
                 : null, // mất kết nối → disable
-            activeColor: Colors.white,
+            activeThumbColor: Colors.white,
             inactiveThumbColor: Colors.grey,
             inactiveTrackColor: Colors.grey.shade300,
           ),

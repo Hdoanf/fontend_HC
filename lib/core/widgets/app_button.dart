@@ -4,11 +4,7 @@ class AppButton extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
 
-  const AppButton({
-    super.key,
-    required this.text,
-    this.onTap,
-  });
+  const AppButton({super.key, required this.text, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -26,4 +22,3 @@ class AppButton extends StatelessWidget {
     );
   }
 }
-

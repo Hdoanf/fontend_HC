@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:thuctap/core/constants/app_colors.dart';
 import 'package:thuctap/core/constants/app_sizes.dart';
 import 'package:thuctap/core/constants/app_strings.dart';
-import 'package:thuctap/features/auth/presentation/widgets/home/mobile/device_card.dart';
+
+import 'device_card.dart';
 
 class FrequentlyUsedSection extends StatelessWidget {
-  const FrequentlyUsedSection({Key? key}) : super(key: key);
+  const FrequentlyUsedSection({super.key});
 
   @override
   Widget build(BuildContext context) {

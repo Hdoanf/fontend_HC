@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:thuctap/core/constants/app_strings.dart';
-import 'package:thuctap/features/auth/presentation/widgets/home/mobile/device_card.dart';
+import 'package:thuctap/features/home/mobile/device_card.dart';
 
 class MobileDevicesPage extends StatelessWidget {
   const MobileDevicesPage({super.key});
@@ -39,9 +39,7 @@ class MobileDevicesPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Devices'),
-      ),
+      appBar: AppBar(title: const Text('My Devices')),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: devices.length,

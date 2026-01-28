@@ -6,7 +6,7 @@ import 'package:thuctap/core/constants/app_strings.dart';
 import 'room_card.dart';
 
 class RoomsSection extends StatelessWidget {
-  const RoomsSection({Key? key}) : super(key: key);
+  const RoomsSection({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../widgets/home/mobile/bottom_nav_bar.dart';
+import '../mobile/bottom_nav_bar.dart';
 
 class DesktopShellPage extends StatefulWidget {
   final Widget child;
