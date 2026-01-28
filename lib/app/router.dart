@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:thuctap/features/auth/presentation/pages/desktop_shell_page.dart';
+import 'package:thuctap/features/auth/presentation/widgets/profile/desktop/profile_edit_desktop.dart';
 
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_up_page.dart';
@@ -30,6 +31,10 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/devices',
           builder: (context, state) => const MobileDevicesPage(),
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => const ProfileEditDesktop(),
         ),
       ],
     ),
