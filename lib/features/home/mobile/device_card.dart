@@ -96,7 +96,7 @@ class _DeviceCardState extends State<DeviceCard> {
                     });
                   }
                 : null, // mất kết nối → disable
-            activeThumbColor: Colors.white,
+            activeColor: Colors.white,
             inactiveThumbColor: Colors.grey,
             inactiveTrackColor: Colors.grey.shade300,
           ),

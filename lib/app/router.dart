@@ -7,7 +7,7 @@ import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_up_page.dart';
 import '../features/home/home_page.dart';
 import '../features/home/mobile/mobile_shell_page.dart';
-import '../features/home/devices/mobile_devices_page.dart';
+import '../features/devices/mobile_devices_page.dart';
 import '../shared/responsive/responsive_layout.dart';
 
 final GoRouter appRouter = GoRouter(
