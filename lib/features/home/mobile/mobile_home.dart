@@ -13,8 +13,6 @@ class MobileHomePage extends StatefulWidget {
 }
 
 class _MobileHomePageState extends State<MobileHomePage> {
-  int _selectedNavIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
