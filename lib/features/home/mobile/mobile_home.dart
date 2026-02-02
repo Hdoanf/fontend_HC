@@ -3,7 +3,9 @@ import 'package:thuctap/core/constants/app_colors.dart';
 import 'package:thuctap/core/constants/app_sizes.dart';
 import 'package:thuctap/features/home/mobile/frequently_used_section.dart';
 import 'package:thuctap/features/home/mobile/header_widget.dart';
+import 'package:thuctap/features/home/mobile/menu_page.dart';
 import 'package:thuctap/features/home/mobile/rooms_section.dart';
+import '';
 
 class MobileHomePage extends StatefulWidget {
   const MobileHomePage({Key? key}) : super(key: key);
@@ -22,12 +24,20 @@ class _MobileHomePageState extends State<MobileHomePage> {
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(AppSizes.paddingMedium),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceGray,
-              borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MenuPage()),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceGray,
+                borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+              ),
+              child: Icon(Icons.menu, color: AppColors.textPrimary),
             ),
-            child: Icon(Icons.menu, color: AppColors.textPrimary),
           ),
         ),
         actions: [

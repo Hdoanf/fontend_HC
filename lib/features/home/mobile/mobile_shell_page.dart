@@ -9,10 +9,11 @@ class MobileShellPage extends StatelessWidget {
 
   int _locationToIndex(String location) {
     if (location.startsWith('/devices')) return 1;
-    if (location.startsWith('/location')) return 2;
+    if (location.startsWith('/rooms')) return 2;
     if (location.startsWith('/stats')) return 3;
-    if (location.startsWith('/history')) return 4;
+    if (location.startsWith('/scheduler')) return 4;
     if (location.startsWith('/settings')) return 5;
+    if (location.startsWith('/profile-edit-mobile')) return 5;
     return 0; // home
   }
 
@@ -33,13 +34,13 @@ class MobileShellPage extends StatelessWidget {
               context.go('/devices');
               break;
             case 2:
-              context.go('/location');
+              context.go('/rooms');
               break;
             case 3:
               context.go('/stats');
               break;
             case 4:
-              context.go('/history');
+              context.go('/scheduler');
               break;
             case 5:
               context.go('/settings');
