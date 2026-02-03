@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:thuctap/features/location/data/models/device_location_model.dart';
 import '../widgets/mobile/mobile_location_map.dart';
 
@@ -13,7 +14,7 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
   late List<DeviceLocationModel> devices;
   String selectedRoom = 'Master Bedroom';
 
-  final Map<String, List<DeviceLocationModel>> roomDevices = {
+  Map<String, List<DeviceLocationModel>> roomDevices = {
     'Master Bedroom': [
       DeviceLocationModel(
         id: '1',
@@ -114,6 +115,75 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
     });
   }
 
+  void _toggleDeviceState(DeviceLocationModel device) {
+    setState(() {
+      final index = devices.indexWhere((d) => d.id == device.id);
+      if (index != -1) {
+        devices[index] = DeviceLocationModel(
+          id: device.id,
+          name: device.name,
+          roomId: device.roomId,
+          x: device.x,
+          y: device.y,
+          status: device.status,
+          isOn: !device.isOn,
+          icon: device.icon,
+        );
+      }
+    });
+  }
+
+  void _addNewDevice(String deviceName) {
+    final random = Random();
+    setState(() {
+      final newDevice = DeviceLocationModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: deviceName,
+        roomId: selectedRoom,
+        x: (random.nextInt(81) + 10).toDouble(),
+        y: (random.nextInt(81) + 10).toDouble(),
+        status: 'Connected',
+        isOn: false,
+        icon: 'default',
+      );
+      roomDevices[selectedRoom]!.add(newDevice);
+      devices = roomDevices[selectedRoom]!;
+    });
+  }
+
+  void _showAddDeviceDialog() {
+    final TextEditingController deviceNameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add New Device'),
+          content: TextField(
+            controller: deviceNameController,
+            decoration: const InputDecoration(hintText: "Enter device name"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (deviceNameController.text.isNotEmpty) {
+                  _addNewDevice(deviceNameController.text);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -173,9 +243,9 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
               padding: const EdgeInsets.all(16),
               child: MobileLocationMap(
                 devices: devices,
-                roomImage:
-                    roomImages[selectedRoom] ??
+                roomImage: roomImages[selectedRoom] ??
                     'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500',
+                onDeviceTap: _toggleDeviceState,
               ),
             ),
             // Devices List
@@ -184,13 +254,49 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Devices in this room',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Devices in this room',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: _showAddDeviceDialog,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2563EB),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Add Device',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   ...List.generate(devices.length, (index) {

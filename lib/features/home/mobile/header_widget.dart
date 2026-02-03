@@ -23,7 +23,7 @@ class HeaderWidget extends StatelessWidget {
                 AppSizes.profileAvatarSize / 2,
               ),
               child: Image.network(
-                'https://scontent.fhan19-1.fna.fbcdn.net/v/t39.30808-6/480687439_997331652508361_7218280523185220920_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeHMlg0OzlB3v-_6hDYcMD1EjP0bODaIebmM_Rs4Noh5uToEf218ndixjOCvYE883Al_tzYdV9XlSw8EBjNKdvhw&_nc_ohc=4KNq08NCV2EQ7kNvwEnf5z8&_nc_oc=AdlZm3-XbWS9wUTMn6yG-PPtXJEDHTWSicQ-ame6EL57lAq48OuTF3iKpxeAs1_cT6s&_nc_zt=23&_nc_ht=scontent.fhan19-1.fna&_nc_gid=oD2HaRilSSwSImxXAL9RLQ&oh=00_AfoCmenKOfxUe5915P18MWyJxBYQz8e_nH0wyLW6BdQrYw&oe=697F507D',
+                'https://th.bing.com/th/id/OIP.OmJICjo6Xt-Ay8oWfxkGNQHaHa?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3',
                 fit: BoxFit.cover,
               ),
             ),

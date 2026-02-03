@@ -1,11 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:thuctap/features/devices/desktop_devices_page.dart';
+import 'package:thuctap/features/profile/desktop/change_pass.dart';
+import 'package:thuctap/features/scheduler/presentation/pages/device_scheduler_page.dart';
 import 'package:thuctap/features/scheduler/presentation/pages/mobile_scheduler_page.dart';
 import 'package:thuctap/features/home/desktop/desktop_shell_page.dart';
 import 'package:thuctap/features/location/presentation/pages/desktop_location_page.dart';
 import 'package:thuctap/features/location/presentation/pages/mobile_location_page.dart';
 import 'package:thuctap/features/profile/desktop/profile_edit_desktop.dart';
 import 'package:thuctap/features/profile/mobile/profile_edit_mobile.dart';
+import 'package:thuctap/features/settings/presentation/pages/settings_page_desktop.dart';
 import 'package:thuctap/features/stats/presentation/pages/desktop_stats_page.dart';
 import 'package:thuctap/features/stats/presentation/pages/mobile_stats_page.dart';
 import 'package:thuctap/features/settings/presentation/pages/mobile_settings_page.dart';
@@ -60,8 +64,8 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) {
             return const ResponsiveLayout(
               mobile: MobileStatsPage(),
-              tablet: DesktopStatsPage(),
-              web: DesktopStatsPage(),
+              tablet: StatEnergyPage(),
+              web: StatEnergyPage(),
             );
           },
         ),
@@ -70,8 +74,9 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) {
             return const ResponsiveLayout(
               mobile: MobileSchedulerPage(),
-              tablet: DesktopStatsPage(), // Placeholder for desktop scheduler
-              web: DesktopStatsPage(), // Placeholder for desktop scheduler
+              tablet:
+                  DeviceSchedulerPage(), // Placeholder for desktop scheduler
+              web: DeviceSchedulerPage(), // Placeholder for desktop scheduler
             );
           },
         ),
@@ -80,8 +85,8 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) {
             return const ResponsiveLayout(
               mobile: MobileSettingsPage(),
-              tablet: ProfileEditDesktop(),
-              web: ProfileEditDesktop(),
+              tablet: SettingsPageDesktop(),
+              web: SettingsPageDesktop(),
             );
           },
         ),
@@ -94,7 +99,11 @@ final GoRouter appRouter = GoRouter(
               web: ProfileEditDesktop(),
             );
           },
-        )
+        ),
+        GoRoute(
+          path: '/change-pass',
+          builder: (context, state) => const ChangePass(),
+        ),
       ],
     ),
   ],

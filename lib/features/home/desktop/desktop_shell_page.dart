@@ -39,7 +39,7 @@ class _DesktopShellPageState extends State<DesktopShellPage> {
                   context.go('/stats');
                   break;
                 case 4:
-                  context.go('/history');
+                  context.go('/scheduler');
                   break;
                 case 5:
                   context.go('/settings');

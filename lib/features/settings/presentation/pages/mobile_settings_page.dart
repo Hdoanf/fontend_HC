@@ -45,7 +45,7 @@ class MobileSettingsPage extends StatelessWidget {
             icon: Icons.lock_outline,
             title: 'Change Password',
             onTap: () {
-              // Navigate to change password page
+              context.push('/change-pass');
             },
           ),
           _buildSettingsItem(

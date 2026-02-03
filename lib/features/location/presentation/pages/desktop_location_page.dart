@@ -1,6 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:thuctap/features/location/data/models/device_location_model.dart';
-import '../widgets/desktop/desktop_location_map.dart';
+import 'package:thuctap/core/constants/app_colors.dart';
+
+/// ===================== MODELS =====================
+
+class SmartDevice {
+  final String name;
+  bool isOn;
+
+  SmartDevice({required this.name, this.isOn = false});
+}
+
+class SmartRoom {
+  final String name;
+  final Color color;
+  final String image;
+  final List<SmartDevice> devices;
+
+  SmartRoom({
+    required this.name,
+    required this.color,
+    required this.image,
+    required this.devices,
+  });
+}
+
+/// ===================== PAGE =====================
 
 class DesktopLocationPage extends StatefulWidget {
   const DesktopLocationPage({super.key});
@@ -10,433 +34,86 @@ class DesktopLocationPage extends StatefulWidget {
 }
 
 class _DesktopLocationPageState extends State<DesktopLocationPage> {
-  late List<DeviceLocationModel> devices;
-  String selectedRoom = 'Master Bedroom';
-  String? selectedDeviceId;
+  SmartRoom? selectedRoom;
 
-  final Map<String, List<DeviceLocationModel>> roomDevices = {
-    'Master Bedroom': [
-      DeviceLocationModel(
-        id: '1',
-        name: 'Air Condition',
-        roomId: 'bedroom',
-        x: 20,
-        y: 30,
-        status: 'Connected',
-        isOn: true,
-        icon: 'ac',
-      ),
-      DeviceLocationModel(
-        id: '2',
-        name: 'Lamp Light',
-        roomId: 'bedroom',
-        x: 70,
-        y: 25,
-        status: 'Connected',
-        isOn: false,
-        icon: 'lamp',
-      ),
-      DeviceLocationModel(
-        id: '3',
-        name: 'Ceiling Fan',
-        roomId: 'bedroom',
-        x: 50,
-        y: 50,
-        status: 'Connected',
-        isOn: true,
-        icon: 'fan',
-      ),
-    ],
-    'Kitchen': [
-      DeviceLocationModel(
-        id: '4',
-        name: 'Kitchen Light',
-        roomId: 'kitchen',
-        x: 30,
-        y: 40,
-        status: 'Connected',
-        isOn: true,
-        icon: 'light',
-      ),
-      DeviceLocationModel(
-        id: '5',
-        name: 'Oven',
-        roomId: 'kitchen',
-        x: 70,
-        y: 60,
-        status: 'Connected',
-        isOn: false,
-        icon: 'oven',
-      ),
-      DeviceLocationModel(
-        id: '6',
-        name: 'Refrigerator',
-        roomId: 'kitchen',
-        x: 45,
-        y: 75,
-        status: 'Connected',
-        isOn: true,
-        icon: 'fridge',
-      ),
-    ],
-    'Living Room': [
-      DeviceLocationModel(
-        id: '7',
-        name: 'TV',
-        roomId: 'living',
-        x: 50,
-        y: 35,
-        status: 'Connected',
-        isOn: true,
-        icon: 'tv',
-      ),
-      DeviceLocationModel(
-        id: '8',
-        name: 'Speaker',
-        roomId: 'living',
-        x: 25,
-        y: 70,
-        status: 'Disconnected',
-        isOn: false,
-        icon: 'speaker',
-      ),
-      DeviceLocationModel(
-        id: '9',
-        name: 'Lights',
-        roomId: 'living',
-        x: 75,
-        y: 45,
-        status: 'Connected',
-        isOn: true,
-        icon: 'light',
-      ),
-    ],
-  };
+  late final List<SmartRoom> rooms = [
+    SmartRoom(
+      name: 'Living Room',
+      color: AppColors.roomCardLiving,
+      image: 'assets/images/living_room.png',
+      devices: [
+        SmartDevice(name: 'Lamp', isOn: true),
+        SmartDevice(name: 'TV'),
+        SmartDevice(name: 'Speaker'),
+      ],
+    ),
+    SmartRoom(
+      name: 'Kitchen',
+      color: AppColors.roomCardKitchen,
+      image: 'assets/images/kitchen.png',
+      devices: [
+        SmartDevice(name: 'Oven'),
+        SmartDevice(name: 'Light', isOn: true),
+      ],
+    ),
+    SmartRoom(
+      name: 'Bedroom',
+      color: AppColors.roomCardBed,
+      image: 'assets/images/bedroom.png',
+      devices: [
+        SmartDevice(name: 'Air Conditioner', isOn: true),
+        SmartDevice(name: 'Night Lamp'),
+      ],
+    ),
+    SmartRoom(
+      name: 'Office',
+      color: AppColors.roomCardGuest,
+      image: 'assets/images/office.png',
+      devices: [
+        SmartDevice(name: 'PC'),
+        SmartDevice(name: 'Desk Lamp'),
+      ],
+    ),
+  ];
 
-  final Map<String, String> roomImages = {
-    'Master Bedroom':
-        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800',
-    'Kitchen':
-        'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800',
-    'Living Room':
-        'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800',
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    devices = roomDevices[selectedRoom] ?? [];
-  }
-
-  void _changeRoom(String roomName) {
+  void selectRoom(String roomName) {
     setState(() {
-      selectedRoom = roomName;
-      devices = roomDevices[roomName] ?? [];
-      selectedDeviceId = null;
-    });
-  }
-
-  void _toggleDevice(DeviceLocationModel device) {
-    setState(() {
-      final index = devices.indexWhere((d) => d.id == device.id);
-      if (index != -1) {
-        devices[index] = DeviceLocationModel(
-          id: device.id,
-          name: device.name,
-          roomId: device.roomId,
-          x: device.x,
-          y: device.y,
-          status: device.status,
-          isOn: !device.isOn,
-          icon: device.icon,
-        );
-      }
+      selectedRoom = rooms.firstWhere((r) => r.name == roomName);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 768;
-
     return Scaffold(
-      appBar: AppBar(
-        elevation: 1,
-        backgroundColor: Colors.white,
-        title: const Text(
-          'Home Location Map',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        centerTitle: true,
-      ),
+      backgroundColor: AppColors.surfaceLight,
       body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(32),
+        child: Column(
           children: [
-            // Main Map Area
+            const _Header(),
+            const SizedBox(height: 24),
             Expanded(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  // Room Selector
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: roomDevices.keys.map((roomName) {
-                        final isSelected = selectedRoom == roomName;
-                        return GestureDetector(
-                          onTap: () => _changeRoom(roomName),
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 12),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? const Color(0xFF2563EB)
-                                  : Colors.grey[200],
-                              borderRadius: BorderRadius.circular(24),
-                              border: isSelected
-                                  ? null
-                                  : Border.all(color: Colors.grey[300]!),
-                            ),
-                            child: Text(
-                              roomName,
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : Colors.black87,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Map
                   Expanded(
-                    child: DesktopLocationMap(
-                      devices: devices,
-                      roomImage:
-                          roomImages[selectedRoom] ??
-                          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800',
+                    flex: 3,
+                    child: DesktopHouseOverview(
+                      rooms: rooms,
+                      selectedRoom: selectedRoom,
+                      onRoomTap: selectRoom,
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 24),
-            // Sidebar - Device List
-            Container(
-              width: 320,
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.grey[200]!),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Devices',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$selectedRoom (${devices.length} devices)',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Device List
+                  const SizedBox(width: 24),
                   Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: devices.length,
-                      itemBuilder: (context, index) {
-                        final device = devices[index];
-                        final isSelected = selectedDeviceId == device.id;
-
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedDeviceId = isSelected ? null : device.id;
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                    flex: 2,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: selectedRoom == null
+                          ? const _EmptyPanel()
+                          : RoomControlPanel(
+                              key: ValueKey(selectedRoom!.name),
+                              room: selectedRoom!,
                             ),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? const Color(0xFF2563EB).withOpacity(0.1)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: isSelected
-                                    ? const Color(0xFF2563EB).withOpacity(0.3)
-                                    : Colors.transparent,
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: device.isOn
-                                            ? Colors.green
-                                            : Colors.red,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        device.name,
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  device.status,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: device.status == 'Connected'
-                                        ? Colors.green
-                                        : Colors.red,
-                                  ),
-                                ),
-                                if (isSelected) ...[
-                                  const SizedBox(height: 10),
-                                  Container(
-                                    width: double.infinity,
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF2563EB,
-                                      ).withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(
-                                        color: const Color(
-                                          0xFF2563EB,
-                                        ).withOpacity(0.3),
-                                      ),
-                                    ),
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () => _toggleDevice(device),
-                                        borderRadius: BorderRadius.circular(6),
-                                        child: Center(
-                                          child: Text(
-                                            device.isOn
-                                                ? 'Turn Off'
-                                                : 'Turn On',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xFF2563EB),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  // Footer Stats
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      border: Border(top: BorderSide(color: Colors.grey[200]!)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Column(
-                          children: [
-                            Text(
-                              '${devices.where((d) => d.isOn).length}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF2563EB),
-                              ),
-                            ),
-                            Text(
-                              'On',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Text(
-                              '${devices.where((d) => !d.isOn).length}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            Text(
-                              'Off',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
                     ),
                   ),
                 ],
@@ -444,6 +121,295 @@ class _DesktopLocationPageState extends State<DesktopLocationPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// ===================== HEADER =====================
+
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Text(
+          'Home / Location',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        Spacer(),
+        Icon(Icons.settings, color: AppColors.textSecondary),
+      ],
+    );
+  }
+}
+
+/// ===================== HOUSE MAP =====================
+
+class DesktopHouseOverview extends StatelessWidget {
+  final List<SmartRoom> rooms;
+  final SmartRoom? selectedRoom;
+  final void Function(String roomName) onRoomTap;
+
+  const DesktopHouseOverview({
+    super.key,
+    required this.rooms,
+    required this.onRoomTap,
+    this.selectedRoom,
+  });
+
+  SmartRoom room(String name) => rooms.firstWhere((r) => r.name == name);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(36),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFEAFBFF), Color(0xFFF4F1FF)],
+        ),
+      ),
+      child: Column(
+        children: [
+          _roomTile(room('Living Room'), height: 160),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(child: _roomTile(room('Bedroom'), height: 140)),
+              const SizedBox(width: 20),
+              Expanded(child: _roomTile(room('Kitchen'), height: 140)),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _roomTile(room('Office'), height: 140),
+        ],
+      ),
+    );
+  }
+
+  Widget _roomTile(SmartRoom room, {required double height}) {
+    final isSelected = selectedRoom?.name == room.name;
+
+    return GestureDetector(
+      onTap: () => onRoomTap(room.name),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        height: height,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          border: isSelected
+              ? Border.all(color: AppColors.primary, width: 2)
+              : null,
+          image: DecorationImage(
+            image: AssetImage(room.image),
+            fit: BoxFit.cover,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            gradient: LinearGradient(
+              colors: [
+                Colors.black.withOpacity(0.45),
+                Colors.black.withOpacity(0.1),
+              ],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                room.name.toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  letterSpacing: 1.2,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              Row(
+                children: List.generate(
+                  room.devices.length,
+                  (index) => Container(
+                    margin: const EdgeInsets.only(right: 6),
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// ===================== CONTROL PANEL =====================
+
+class RoomControlPanel extends StatefulWidget {
+  final SmartRoom room;
+
+  const RoomControlPanel({super.key, required this.room});
+
+  @override
+  State<RoomControlPanel> createState() => _RoomControlPanelState();
+}
+
+class _RoomControlPanelState extends State<RoomControlPanel> {
+  void _showAddDeviceDialog() {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add new device'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'Device name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final name = controller.text.trim();
+              if (name.isEmpty) return;
+
+              setState(() {
+                widget.room.devices.add(SmartDevice(name: name));
+              });
+
+              Navigator.pop(context);
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.room.name,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${widget.room.devices.length} devices',
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
+              TextButton.icon(
+                onPressed: _showAddDeviceDialog,
+                icon: const Icon(Icons.add),
+                label: const Text('Add device'),
+              ),
+            ],
+          ),
+          const Divider(),
+          Expanded(
+            child: ListView(
+              children: widget.room.devices.map((device) {
+                return _DeviceTile(
+                  device: device,
+                  onChanged: (v) {
+                    setState(() => device.isOn = v);
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// ===================== DEVICE TILE =====================
+
+class _DeviceTile extends StatelessWidget {
+  final SmartDevice device;
+  final ValueChanged<bool> onChanged;
+
+  const _DeviceTile({required this.device, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: AppColors.surfaceLight,
+      ),
+      child: Row(
+        children: [
+          Text(device.name, style: const TextStyle(fontSize: 16)),
+          const Spacer(),
+          Switch(
+            value: device.isOn,
+            activeColor: AppColors.primary,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// ===================== EMPTY PANEL =====================
+
+class _EmptyPanel extends StatelessWidget {
+  const _EmptyPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: const Text(
+        'Select a room to control devices',
+        style: TextStyle(color: AppColors.textSecondary),
       ),
     );
   }

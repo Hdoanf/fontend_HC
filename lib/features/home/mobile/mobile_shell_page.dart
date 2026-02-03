@@ -14,6 +14,7 @@ class MobileShellPage extends StatelessWidget {
     if (location.startsWith('/scheduler')) return 4;
     if (location.startsWith('/settings')) return 5;
     if (location.startsWith('/profile-edit-mobile')) return 5;
+    if (location.startsWith('/change-pass')) return 5;
     return 0; // home
   }
 

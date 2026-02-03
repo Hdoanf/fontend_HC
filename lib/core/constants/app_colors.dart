@@ -40,6 +40,7 @@ class AppColors {
   static const Color roomCardLiving = Color(0xFFDEF7FF);
   static const Color roomCardStudy = Color(0xFFFEF3C7);
   static const Color roomCardGuest = Color(0xFFF5F3FF);
+  static const Color roomCardKitchen = Color(0xFF2563EB);
 
   // Chart colors
   static const Color chartBlue = Color(0xFF3B82F6);

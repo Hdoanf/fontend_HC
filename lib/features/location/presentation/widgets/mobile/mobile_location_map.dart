@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:thuctap/features/location/data/models/device_location_model.dart'; 
+import 'package:thuctap/features/location/data/models/device_location_model.dart';
 
 class MobileLocationMap extends StatefulWidget {
   final List<DeviceLocationModel> devices;
   final String roomImage;
+  final Function(DeviceLocationModel) onDeviceTap;
 
   const MobileLocationMap({
     Key? key,
     required this.devices,
     required this.roomImage,
+    required this.onDeviceTap,
   }) : super(key: key);
 
   @override
@@ -77,7 +79,18 @@ class _MobileLocationMapState extends State<MobileLocationMap> {
             ),
           ),
           // Device Markers Overlay
-          Positioned.fill(
+          GestureDetector(
+            onTapDown: (details) {
+              for (final device in widget.devices) {
+                final devicePos = Offset(
+                  (device.x / 100) * context.size!.width,
+                  (device.y / 100) * context.size!.height,
+                );
+                if ((details.localPosition - devicePos).distance < 20) {
+                  widget.onDeviceTap(device);
+                }
+              }
+            },
             child: CustomPaint(
               painter: DeviceMapPainter(
                 devices: widget.devices,
@@ -173,14 +186,15 @@ class DeviceMapPainter extends CustomPainter {
         ..style = PaintingStyle.stroke;
       canvas.drawCircle(Offset(x, y), 16, borderPaint);
 
-      // Draw icon text (simplified)
+      // Draw icon
+      final icon = device.isOn ? Icons.lightbulb : Icons.lightbulb_outline;
       final textPainter = TextPainter(
         text: TextSpan(
-          text: device.isOn ? '●' : '○',
-          style: const TextStyle(
+          text: String.fromCharCode(icon.codePoint),
+          style: TextStyle(
             color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            fontFamily: icon.fontFamily,
           ),
         ),
         textDirection: TextDirection.ltr,
@@ -199,7 +213,7 @@ class DeviceMapPainter extends CustomPainter {
             color: Colors.black87,
             fontSize: 10,
             fontWeight: FontWeight.w500,
-            backgroundColor: Colors.white70,
+            backgroundColor: Colors.white.withOpacity(0.7),
           ),
         ),
         textDirection: TextDirection.ltr,

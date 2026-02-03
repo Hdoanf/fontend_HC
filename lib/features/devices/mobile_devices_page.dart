@@ -9,60 +9,35 @@ class MobileDevicesPage extends StatefulWidget {
 }
 
 class _MobileDevicesPageState extends State<MobileDevicesPage> {
-  late VideoPlayerController _videoController;
-
-  final List<Map<String, dynamic>> devices = [
+  final List<Map<String, String>> cameras = [
     {
-      'name': 'Air Condition',
-      'isConnected': true,
-      'icon': Icons.ac_unit,
-      'isOn': true,
+      'name': 'Cam 1',
+      'videoUrl':
+          'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
     },
     {
-      'name': 'Lamp Light',
-      'isConnected': false,
-      'icon': Icons.lightbulb,
-      'isOn': false,
+      'name': 'Cam 2',
+      'videoUrl':
+          'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
     },
     {
-      'name': 'Ceiling Fan',
-      'isConnected': false,
-      'icon': Icons.settings_remote,
-      'isOn': false,
+      'name': 'Cam 3',
+      'videoUrl':
+          'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     },
     {
-      'name': 'Homepod Mini',
-      'isConnected': true,
-      'icon': Icons.speaker,
-      'isOn': false,
+      'name': 'Cam 4',
+      'videoUrl':
+          'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     },
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _videoController =
-        VideoPlayerController.networkUrl(
-            Uri.parse(
-              'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
-            ),
-          )
-          ..initialize().then((_) => setState(() {}))
-          ..setLooping(true);
-  }
-
-  @override
-  void dispose() {
-    _videoController.dispose();
-    super.dispose();
-  }
-
-  void _toggleDevice(int index) {
-    setState(() {
-      if (devices[index]['isConnected']) {
-        devices[index]['isOn'] = !devices[index]['isOn'];
-      }
-    });
+  void _showVideoDialog(String videoUrl, String cameraName) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          VideoDialog(videoUrl: videoUrl, cameraName: cameraName),
+    );
   }
 
   @override
@@ -71,12 +46,8 @@ class _MobileDevicesPageState extends State<MobileDevicesPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        // leading: GestureDetector(
-        //   onTap: () => Navigator.pop(context),
-        //   child: const Icon(Icons.arrow_back, color: Colors.black),
-        // ),
         title: const Text(
-          'Master Bedroom',
+          'Cameras',
           style: TextStyle(
             color: Colors.black,
             fontSize: 18,
@@ -95,54 +66,10 @@ class _MobileDevicesPageState extends State<MobileDevicesPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🎥 VIDEO ROOM
-            _buildRoomVideo(),
-
             const SizedBox(height: 24),
-
-            /// DEVICES HEADER
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Devices',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                  ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2563EB),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.add, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-
+            _buildCamerasHeader(),
             const SizedBox(height: 16),
-
-            /// GRID DEVICES
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.9,
-                ),
-                itemCount: devices.length,
-                itemBuilder: (context, index) {
-                  return _buildDeviceCard(index);
-                },
-              ),
-            ),
+            _buildCamerasGrid(),
             const SizedBox(height: 24),
           ],
         ),
@@ -150,23 +77,174 @@ class _MobileDevicesPageState extends State<MobileDevicesPage> {
     );
   }
 
-  /// ================= VIDEO =================
+  // ================= CAMERAS HEADER =================
+  Widget _buildCamerasHeader() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Live Feeds',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================= GRID CAMERAS =================
+  Widget _buildCamerasGrid() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: cameras.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.9,
+        ),
+        itemBuilder: (context, index) {
+          return _buildCameraCard(index);
+        },
+      ),
+    );
+  }
+
+  // ================= CAMERA CARD =================
+  Widget _buildCameraCard(int index) {
+    final camera = cameras[index];
+
+    return GestureDetector(
+      onTap: () => _showVideoDialog(camera['videoUrl']!, camera['name']!),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[300]!, width: 1.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.videocam, size: 48, color: Color(0xFF2563EB)),
+            const SizedBox(height: 12),
+            Text(
+              camera['name']!,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class VideoDialog extends StatefulWidget {
+  final String videoUrl;
+  final String cameraName;
+
+  const VideoDialog({
+    super.key,
+    required this.videoUrl,
+    required this.cameraName,
+  });
+
+  @override
+  State<VideoDialog> createState() => _VideoDialogState();
+}
+
+class _VideoDialogState extends State<VideoDialog> {
+  late VideoPlayerController _videoController;
+  bool _isFullScreen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _videoController =
+        VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
+          ..initialize().then((_) {
+            setState(() {});
+            _videoController.play();
+          })
+          ..setLooping(true);
+  }
+
+  @override
+  void dispose() {
+    _videoController.dispose();
+    super.dispose();
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: _isFullScreen
+          ? EdgeInsets.zero
+          : const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: _isFullScreen ? MediaQuery.of(context).size.width : null,
+        height: _isFullScreen ? MediaQuery.of(context).size.height : null,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!_isFullScreen)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.cameraName,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+            Expanded(child: _buildRoomVideo()),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ================= VIDEO =================
   Widget _buildRoomVideo() {
     return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(16),
-        bottomRight: Radius.circular(16),
-      ),
-      child: Container(
-        height: 200,
-        width: double.infinity,
+      borderRadius: _isFullScreen
+          ? BorderRadius.zero
+          : const BorderRadius.all(Radius.circular(16)),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
         color: Colors.black,
         child: _videoController.value.isInitialized
             ? Stack(
+                fit: StackFit.expand,
                 children: [
-                  AspectRatio(
-                    aspectRatio: _videoController.value.aspectRatio,
-                    child: VideoPlayer(_videoController),
+                  FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: _videoController.value.size.width,
+                      height: _videoController.value.size.height,
+                      child: VideoPlayer(_videoController),
+                    ),
                   ),
                   Center(
                     child: IconButton(
@@ -186,77 +264,24 @@ class _MobileDevicesPageState extends State<MobileDevicesPage> {
                       },
                     ),
                   ),
+                  Positioned(
+                    top: _isFullScreen ? 40 : 8,
+                    right: 8,
+                    child: IconButton(
+                      icon: Icon(
+                        _isFullScreen
+                            ? Icons.fullscreen_exit
+                            : Icons.fullscreen,
+                        color: Colors.white,
+                      ),
+                      onPressed: _toggleFullScreen,
+                    ),
+                  ),
                 ],
               )
             : const Center(
                 child: CircularProgressIndicator(color: Colors.white),
               ),
-      ),
-    );
-  }
-
-  /// ================= DEVICE CARD =================
-  Widget _buildDeviceCard(int index) {
-    final device = devices[index];
-    final isConnected = device['isConnected'] as bool;
-    final isOn = device['isOn'] as bool;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isConnected && isOn
-            ? const Color(0xFF2563EB).withOpacity(0.1)
-            : Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isConnected && isOn
-              ? const Color(0xFF2563EB).withOpacity(0.3)
-              : Colors.grey[300]!,
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(
-                  device['icon'],
-                  size: 24,
-                  color: isConnected && isOn
-                      ? const Color(0xFF2563EB)
-                      : Colors.grey,
-                ),
-                Switch(
-                  value: isOn && isConnected,
-                  onChanged: isConnected ? (_) => _toggleDevice(index) : null,
-                  activeColor: const Color(0xFF2563EB),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              device['name'],
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              isConnected ? 'Connected' : 'Disconnected',
-              style: TextStyle(
-                fontSize: 12,
-                color: isConnected ? Colors.green : Colors.grey,
-              ),
-            ),
-          ),
-          const Spacer(),
-        ],
       ),
     );
   }
