@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:thuctap/features/auth/presentation/widgets/sign/sign_up_form.dart';
-import '../../../../shared/responsive/responsive_layout.dart';
+import '../../../../core/utils/responsive_layout.dart';
 import '../widgets/sign/sign_in_form.dart';
 
 class SignUpPage extends StatelessWidget {

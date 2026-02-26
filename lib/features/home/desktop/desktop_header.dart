@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:thuctap/features/fire_alert/fire_alert_routes.dart';
+import 'package:thuctap/features/fire_alert/presentation/fire_alert_controller.dart';
 
-class DesktopHeader extends StatelessWidget {
+class DesktopHeader extends ConsumerWidget {
   const DesktopHeader({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(
+      fireAlertControllerProvider.select((state) => state.unreadCount),
+    );
+
     return Row(
       children: [
         const CircleAvatar(
@@ -33,8 +41,36 @@ class DesktopHeader extends StatelessWidget {
         const Spacer(),
 
         IconButton(
-          icon: const Icon(Icons.notifications_none),
-          onPressed: () {},
+          onPressed: () => context.go(FireAlertRoutes.alerts),
+          icon: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const Icon(Icons.notifications_none),
+              if (unreadCount > 0)
+                Positioned(
+                  top: -6,
+                  right: -8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 5,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDC2626),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      unreadCount > 99 ? '99+' : unreadCount.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ],
     );

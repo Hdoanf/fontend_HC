@@ -8,10 +8,7 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceLight,
-      appBar: AppBar(
-        title: const Text('About'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('About'), elevation: 0),
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 1100),
@@ -20,10 +17,7 @@ class AboutPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// ================= LEFT =================
-              Expanded(
-                flex: 2,
-                child: _buildAppInfoCard(),
-              ),
+              Expanded(flex: 2, child: _buildAppInfoCard()),
               const SizedBox(width: 32),
 
               /// ================= RIGHT =================
@@ -50,11 +44,7 @@ class AboutPage extends StatelessWidget {
     return _card(
       child: Column(
         children: [
-          const Icon(
-            Icons.electric_bolt,
-            size: 72,
-            color: AppColors.primary,
-          ),
+          const Icon(Icons.electric_bolt, size: 72, color: AppColors.primary),
           const SizedBox(height: 16),
           const Text(
             'Smart Home Manager',
@@ -83,9 +73,9 @@ class AboutPage extends StatelessWidget {
       title: 'About Application',
       child: const Text(
         'Smart Home Manager is a modern platform that allows users to monitor, '
-            'control, and automate smart devices across their home. '
-            'It provides real-time statistics, scheduling, and secure access '
-            'across multiple devices.',
+        'control, and automate smart devices across their home. '
+        'It provides real-time statistics, scheduling, and secure access '
+        'across multiple devices.',
         style: TextStyle(
           fontSize: 15,
           height: 1.6,
@@ -148,15 +138,10 @@ class AboutPage extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-              ),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -179,8 +164,10 @@ class AboutPage extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             const Icon(Icons.chevron_right),
@@ -190,19 +177,14 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  Widget _card({
-    String? title,
-    required Widget child,
-  }) {
+  Widget _card({String? title, required Widget child}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 18),
-        ],
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 18)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,8 +192,7 @@ class AboutPage extends StatelessWidget {
           if (title != null) ...[
             Text(
               title,
-              style:
-              const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
           ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:thuctap/core/widgets/webcam_mjpeg_view.dart';
 
 class MobileDevicesPage extends StatefulWidget {
   const MobileDevicesPage({super.key});
@@ -9,12 +10,10 @@ class MobileDevicesPage extends StatefulWidget {
 }
 
 class _MobileDevicesPageState extends State<MobileDevicesPage> {
+  static const String _localWebcamUrl = 'http://192.168.1.33:8080/video';
+
   final List<Map<String, String>> cameras = [
-    {
-      'name': 'Cam 1',
-      'videoUrl':
-          'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
-    },
+    {'name': 'Cam 1', 'videoUrl': _localWebcamUrl},
     {
       'name': 'Cam 2',
       'videoUrl':
@@ -158,24 +157,30 @@ class VideoDialog extends StatefulWidget {
 }
 
 class _VideoDialogState extends State<VideoDialog> {
-  late VideoPlayerController _videoController;
+  VideoPlayerController? _videoController;
   bool _isFullScreen = false;
+  late final bool _isMjpegStream;
 
   @override
   void initState() {
     super.initState();
+    _isMjpegStream = _looksLikeMjpeg(widget.videoUrl);
+
+    if (_isMjpegStream) return;
+
     _videoController =
         VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
           ..initialize().then((_) {
+            if (!mounted) return;
             setState(() {});
-            _videoController.play();
+            _videoController?.play();
           })
           ..setLooping(true);
   }
 
   @override
   void dispose() {
-    _videoController.dispose();
+    _videoController?.dispose();
     super.dispose();
   }
 
@@ -234,32 +239,39 @@ class _VideoDialogState extends State<VideoDialog> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         color: Colors.black,
-        child: _videoController.value.isInitialized
+        child: _isMjpegStream
+            ? InteractiveViewer(
+                child: WebcamMjpegView(
+                  streamUrl: widget.videoUrl,
+                  fit: BoxFit.cover,
+                ),
+              )
+            : (_videoController?.value.isInitialized ?? false)
             ? Stack(
                 fit: StackFit.expand,
                 children: [
                   FittedBox(
                     fit: BoxFit.cover,
                     child: SizedBox(
-                      width: _videoController.value.size.width,
-                      height: _videoController.value.size.height,
-                      child: VideoPlayer(_videoController),
+                      width: _videoController!.value.size.width,
+                      height: _videoController!.value.size.height,
+                      child: VideoPlayer(_videoController!),
                     ),
                   ),
                   Center(
                     child: IconButton(
                       iconSize: 56,
                       icon: Icon(
-                        _videoController.value.isPlaying
+                        _videoController!.value.isPlaying
                             ? Icons.pause_circle_filled
                             : Icons.play_circle_fill,
                         color: Colors.white70,
                       ),
                       onPressed: () {
                         setState(() {
-                          _videoController.value.isPlaying
-                              ? _videoController.pause()
-                              : _videoController.play();
+                          _videoController!.value.isPlaying
+                              ? _videoController!.pause()
+                              : _videoController!.play();
                         });
                       },
                     ),
@@ -284,5 +296,12 @@ class _VideoDialogState extends State<VideoDialog> {
               ),
       ),
     );
+  }
+
+  bool _looksLikeMjpeg(String url) {
+    final lower = url.toLowerCase();
+    return lower.contains('/video') ||
+        lower.contains('/mjpeg') ||
+        lower.contains('.mjpg');
   }
 }

@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:thuctap/features/profile/desktop/change_pass.dart';
+import 'package:thuctap/features/settings/presentation/pages/edit_profile_page.dart';
+import 'package:thuctap/features/settings/presentation/pages/notification_settings_page.dart';
 import '../../../../core/constants/app_colors.dart';
 
-class MobileSettingsPage extends StatelessWidget {
+class MobileSettingsPage extends StatefulWidget {
   const MobileSettingsPage({super.key});
+
+  @override
+  State<MobileSettingsPage> createState() => _MobileSettingsPageState();
+}
+
+class _MobileSettingsPageState extends State<MobileSettingsPage> {
+  bool _pushNotificationsEnabled = true;
+  bool _soundAlertsEnabled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +48,12 @@ class MobileSettingsPage extends StatelessWidget {
             icon: Icons.person_outline,
             title: 'Edit Profile',
             onTap: () {
-              context.push('/profile-edit-mobile');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext _) => const EditProfilePage(),
+                ),
+              );
             },
           ),
           _buildSettingsItem(
@@ -45,7 +61,10 @@ class MobileSettingsPage extends StatelessWidget {
             icon: Icons.lock_outline,
             title: 'Change Password',
             onTap: () {
-              context.push('/change-pass');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ChangePass()),
+              );
             },
           ),
           _buildSettingsItem(
@@ -53,7 +72,7 @@ class MobileSettingsPage extends StatelessWidget {
             icon: Icons.email_outlined,
             title: 'Email Preferences',
             onTap: () {
-              // Navigate to email preferences page
+              // Navigate to email preferences pag
             },
           ),
           const Divider(height: 30, thickness: 1, color: AppColors.borderColor),
@@ -62,18 +81,22 @@ class MobileSettingsPage extends StatelessWidget {
             context,
             icon: Icons.notifications_none,
             title: 'Push Notifications',
-            value: true, // Example value
+            value: _pushNotificationsEnabled,
             onChanged: (bool value) {
-              // Handle push notification toggle
+              setState(() {
+                _pushNotificationsEnabled = value;
+              });
             },
           ),
           _buildSettingsToggleItem(
             context,
             icon: Icons.volume_up_outlined,
             title: 'Sound Alerts',
-            value: false, // Example value
+            value: _soundAlertsEnabled,
             onChanged: (bool value) {
-              // Handle sound alerts toggle
+              setState(() {
+                _soundAlertsEnabled = value;
+              });
             },
           ),
           const Divider(height: 30, thickness: 1, color: AppColors.borderColor),

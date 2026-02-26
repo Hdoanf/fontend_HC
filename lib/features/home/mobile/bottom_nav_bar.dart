@@ -5,11 +5,13 @@ import 'package:thuctap/core/constants/app_sizes.dart';
 class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemSelected;
+  final int fireAlertBadgeCount;
 
   const BottomNavBar({
     super.key,
     required this.selectedIndex,
     required this.onItemSelected,
+    this.fireAlertBadgeCount = 0,
   });
 
   bool _isDesktop(BuildContext context) {
@@ -95,10 +97,17 @@ class BottomNavBar extends StatelessWidget {
         onTap: () => onItemSelected(4),
       ),
       _NavBarItem(
-        icon: Icons.settings,
+        icon: Icons.local_fire_department,
         isSelected: selectedIndex == 5,
         isSidebar: isSidebar,
         onTap: () => onItemSelected(5),
+        badgeCount: fireAlertBadgeCount,
+      ),
+      _NavBarItem(
+        icon: Icons.settings,
+        isSelected: selectedIndex == 6,
+        isSidebar: isSidebar,
+        onTap: () => onItemSelected(6),
       ),
     ];
   }
@@ -109,12 +118,14 @@ class _NavBarItem extends StatelessWidget {
   final bool isSelected;
   final bool isSidebar;
   final VoidCallback onTap;
+  final int badgeCount;
 
   const _NavBarItem({
     required this.icon,
     required this.isSelected,
     required this.onTap,
     this.isSidebar = false,
+    this.badgeCount = 0,
   });
 
   @override
@@ -131,14 +142,42 @@ class _NavBarItem extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.12)
+              ? AppColors.primary.withValues(alpha: 0.12)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
         ),
-        child: Icon(
-          icon,
-          color: isSelected ? AppColors.primary : AppColors.textLight,
-          size: AppSizes.iconLarge,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? AppColors.primary : AppColors.textLight,
+              size: AppSizes.iconLarge,
+            ),
+            if (badgeCount > 0)
+              Positioned(
+                top: -8,
+                right: -8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.error,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    badgeCount > 99 ? '99+' : badgeCount.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

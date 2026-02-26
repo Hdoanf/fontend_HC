@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:thuctap/shared/responsive/responsive_layout.dart';
+import 'package:thuctap/core/utils/responsive_layout.dart';
 
 import 'mobile/mobile_home.dart';
 import 'desktop/desktop_home.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/responsive/responsive_layout.dart';
+import '../../../../core/utils/responsive_layout.dart';
 import '../widgets/sign/sign_in_form.dart';
 
 class SignInPage extends StatelessWidget {

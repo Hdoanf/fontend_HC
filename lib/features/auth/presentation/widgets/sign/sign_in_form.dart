@@ -1,14 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../core/widgets/app_button.dart';
 import '../../../../../core/widgets/app_text_field.dart';
+import '../../../data/models/auth_session.dart';
+import '../../login_controller.dart';
 import 'social_buttons.dart';
 
-class SignInForm extends StatelessWidget {
+class SignInForm extends ConsumerStatefulWidget {
   const SignInForm({super.key});
 
   @override
+  ConsumerState<SignInForm> createState() => _SignInFormState();
+}
+
+class _SignInFormState extends ConsumerState<SignInForm> {
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController(text: 'demo@example.com');
+    _passwordController = TextEditingController(text: '123456');
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
+    final isLoading = authState.isLoading;
+
+    ref.listen<AsyncValue<AuthSession?>>(authControllerProvider, (
+      previous,
+      next,
+    ) {
+      final currentError = next.error;
+      if (currentError != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(currentError.toString())));
+      }
+
+      final wasSignedOut = previous?.valueOrNull == null;
+      final isSignedIn = next.valueOrNull != null;
+      if (wasSignedOut && isSignedIn) {
+        context.go('/');
+      }
+    });
+
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -26,14 +72,18 @@ class SignInForm extends StatelessWidget {
           /// Email
           const Text("Email", style: TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
-          const AppTextField(hint: "example@gmail.com"),
+          AppTextField(hint: "example@gmail.com", controller: _emailController),
 
           const SizedBox(height: 12),
 
           /// Password
           const Text("Password", style: TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
-          const AppTextField(hint: "********", isPassword: true),
+          AppTextField(
+            hint: "********",
+            isPassword: true,
+            controller: _passwordController,
+          ),
 
           const SizedBox(height: 12),
 
@@ -46,7 +96,19 @@ class SignInForm extends StatelessWidget {
           const SizedBox(height: 20),
 
           /// Sign In button
-          AppButton(text: "Sign In"),
+          AppButton(
+            text: isLoading ? "Signing in..." : "Sign In",
+            onTap: isLoading
+                ? null
+                : () {
+                    ref
+                        .read(authControllerProvider.notifier)
+                        .signIn(
+                          email: _emailController.text.trim(),
+                          password: _passwordController.text.trim(),
+                        );
+                  },
+          ),
           const SizedBox(height: 8),
 
           /// Go to Home button

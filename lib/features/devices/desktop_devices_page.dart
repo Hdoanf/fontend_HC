@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:thuctap/core/widgets/webcam_mjpeg_view.dart';
 
 class CameraItem {
   final String name;
@@ -15,11 +16,14 @@ class DesktopDevicesPage extends StatefulWidget {
   @override
   State<DesktopDevicesPage> createState() => _DesktopDevicesPageState();
 }
+
 Key _videoKey = UniqueKey();
 
-
 class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
-  late VideoPlayerController _videoController;
+  static const String _localWebcamUrl = 'http://192.168.1.33:8080/video';
+
+  VideoPlayerController? _videoController;
+  bool _isMjpegStream = false;
 
   bool _isFullscreen = false;
   bool _showControls = true;
@@ -28,10 +32,7 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
   int _currentCameraIndex = 0;
 
   final List<CameraItem> cameras = [
-    CameraItem(
-      name: 'Camera 1',
-      url: 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
-    ),
+    CameraItem(name: 'Camera 1', url: _localWebcamUrl),
   ];
 
   @override
@@ -41,26 +42,44 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
   }
 
   Future<void> _initCamera(int index) async {
-    _videoController = VideoPlayerController.networkUrl(
-      Uri.parse(cameras[index].url),
-    );
+    final url = cameras[index].url;
+    _isMjpegStream = _looksLikeMjpeg(url);
+    if (_isMjpegStream) {
+      _videoController?.dispose();
+      _videoController = null;
+      if (mounted) setState(() {});
+      return;
+    }
 
-    await _videoController.initialize();
-    _videoController
+    final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+    await controller.initialize();
+    controller
       ..setLooping(true)
       ..play();
 
+    _videoController = controller;
     if (mounted) setState(() {});
   }
+
   Future<void> _switchCamera(int index) async {
     if (!mounted || index < 0 || index >= cameras.length) return;
 
     final oldController = _videoController;
+    final url = cameras[index].url;
+    final isMjpeg = _looksLikeMjpeg(url);
 
-    final newController = VideoPlayerController.networkUrl(
-      Uri.parse(cameras[index].url),
-    );
+    if (isMjpeg) {
+      if (!mounted) return;
+      setState(() {
+        _currentCameraIndex = index;
+        _isMjpegStream = true;
+        _videoController = null;
+      });
+      oldController?.dispose();
+      return;
+    }
 
+    final newController = VideoPlayerController.networkUrl(Uri.parse(url));
     await newController.initialize();
     newController
       ..setLooping(true)
@@ -73,22 +92,21 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
 
     setState(() {
       _currentCameraIndex = index;
+      _isMjpegStream = false;
       _videoController = newController;
       _videoKey = UniqueKey(); // 🔥 BẮT BUỘC
     });
 
     // Dispose chậm hơn 1 chút để tránh crash texture
     Future.delayed(const Duration(milliseconds: 300), () {
-      oldController.dispose();
+      oldController?.dispose();
     });
   }
-
-
 
   @override
   void dispose() {
     _hideTimer?.cancel();
-    _videoController.dispose();
+    _videoController?.dispose();
     super.dispose();
   }
 
@@ -97,7 +115,7 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
 
     _hideTimer?.cancel();
     _hideTimer = Timer(const Duration(seconds: 1), () {
-      if (mounted && _videoController.value.isPlaying) {
+      if (mounted && (_videoController?.value.isPlaying ?? false)) {
         setState(() => _showControls = false);
       }
     });
@@ -115,9 +133,9 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  _videoController.value.isPlaying
-                      ? _videoController.pause()
-                      : _videoController.play();
+                  _videoController!.value.isPlaying
+                      ? _videoController!.pause()
+                      : _videoController!.play();
                 });
                 _showTemporarily();
               },
@@ -129,7 +147,7 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
                   color: Colors.black45,
                 ),
                 child: Icon(
-                  _videoController.value.isPlaying
+                  _videoController!.value.isPlaying
                       ? Icons.pause
                       : Icons.play_arrow,
                   color: Colors.white,
@@ -186,12 +204,7 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
               final newIndex = cameras.length;
 
               setState(() {
-                cameras.add(
-                  CameraItem(
-                    name: name,
-                    url: url,
-                  ),
-                );
+                cameras.add(CameraItem(name: name, url: url));
               });
 
               await _switchCamera(newIndex);
@@ -205,7 +218,6 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -213,14 +225,14 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
       appBar: _isFullscreen
           ? null
           : AppBar(
-        title: Text(cameras[_currentCameraIndex].name),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _showAddCameraDialog,
-          ),
-        ],
-      ),
+              title: Text(cameras[_currentCameraIndex].name),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: _showAddCameraDialog,
+                ),
+              ],
+            ),
 
       body: Padding(
         padding: EdgeInsets.zero,
@@ -230,9 +242,7 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               width: double.infinity,
-              height: _isFullscreen
-                  ? MediaQuery.of(context).size.height
-                  : 260,
+              height: _isFullscreen ? MediaQuery.of(context).size.height : 260,
               child: _buildVideo(),
             ),
 
@@ -244,7 +254,6 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
           ],
         ),
       ),
-
     );
   }
 
@@ -261,19 +270,12 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
           return GestureDetector(
             onTap: () => _switchCamera(index),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
-                color: isActive
-                    ? Colors.blue.withOpacity(0.15)
-                    : Colors.white,
+                color: isActive ? Colors.blue.withOpacity(0.15) : Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isActive
-                      ? Colors.blue
-                      : Colors.grey.shade300,
+                  color: isActive ? Colors.blue : Colors.grey.shade300,
                 ),
               ),
               child: Text(
@@ -283,7 +285,6 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
                   color: isActive ? Colors.blue : Colors.black,
                 ),
               ),
-
             ),
           );
         },
@@ -296,46 +297,76 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
       color: Colors.black,
       borderRadius: BorderRadius.circular(_isFullscreen ? 0 : 16),
       clipBehavior: Clip.antiAlias,
-      child: _videoController.value.isInitialized
+      child: _isMjpegStream
           ? Stack(
-        children: [
-          Positioned.fill(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: _videoController.value.size.width,
-                height: _videoController.value.size.height,
-                child: VideoPlayer(
-                  _videoController,
-                  key: _videoKey, // 🔥 FIX QUYẾT ĐỊNH
+              children: [
+                Positioned.fill(
+                  child: InteractiveViewer(
+                    child: WebcamMjpegView(
+                      streamUrl: cameras[_currentCameraIndex].url,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-
-              ),
-            ),
-          ),
-          _playPauseButton(),
-          Positioned(
-            top: 12,
-            right: 12,
-            child: IconButton(
-              icon: Icon(
-                _isFullscreen
-                    ? Icons.fullscreen_exit
-                    : Icons.fullscreen,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isFullscreen = !_isFullscreen;
-                });
-              },
-            ),
-          ),
-        ],
-      )
-          : const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: IconButton(
+                    icon: Icon(
+                      _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isFullscreen = !_isFullscreen;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            )
+          : (_videoController?.value.isInitialized ?? false)
+          ? Stack(
+              children: [
+                Positioned.fill(
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: _videoController!.value.size.width,
+                      height: _videoController!.value.size.height,
+                      child: VideoPlayer(
+                        _videoController!,
+                        key: _videoKey, // 🔥 FIX QUYẾT ĐỊNH
+                      ),
+                    ),
+                  ),
+                ),
+                _playPauseButton(),
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: IconButton(
+                    icon: Icon(
+                      _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isFullscreen = !_isFullscreen;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            )
+          : const Center(child: CircularProgressIndicator(color: Colors.white)),
     );
+  }
+
+  bool _looksLikeMjpeg(String url) {
+    final lower = url.toLowerCase();
+    return lower.contains('/video') ||
+        lower.contains('/mjpeg') ||
+        lower.contains('.mjpg');
   }
 }

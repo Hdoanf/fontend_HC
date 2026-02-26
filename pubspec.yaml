@@ -37,7 +37,9 @@ dependencies:
   font_awesome_flutter: ^10.7.0
   cupertino_icons: ^1.0.8
   video_player: ^2.8.6
+  flutter_mjpeg: ^2.0.4
   fl_chart: ^0.69.0
+  flutter_riverpod: ^2.6.1
 
 
   go_router: any
