@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:thuctap/core/widgets/webcam_mjpeg_view.dart';
+import 'package:thuctap/core/constants/app_colors.dart';
+import 'package:thuctap/core/constants/app_sizes.dart';
 
 class MobileDevicesPage extends StatefulWidget {
   const MobileDevicesPage({super.key});
@@ -13,63 +15,117 @@ class _MobileDevicesPageState extends State<MobileDevicesPage> {
   static const String _localWebcamUrl = 'http://192.168.1.33:8080/video';
 
   final List<Map<String, String>> cameras = [
-    {'name': 'Cam 1', 'videoUrl': _localWebcamUrl},
+    {'name': 'Living Room Cam', 'videoUrl': _localWebcamUrl},
     {
-      'name': 'Cam 2',
+      'name': 'Bedroom Cam',
       'videoUrl':
           'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
     },
     {
-      'name': 'Cam 3',
+      'name': 'Kitchen Cam',
       'videoUrl':
           'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     },
     {
-      'name': 'Cam 4',
+      'name': 'Front Door Cam',
       'videoUrl':
           'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     },
   ];
 
   void _showVideoDialog(String videoUrl, String cameraName) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) =>
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) =>
           VideoDialog(videoUrl: videoUrl, cameraName: cameraName),
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: anim1,
+          child: ScaleTransition(
+            scale: anim1.drive(Tween(begin: 0.9, end: 1.0).chain(CurveTween(curve: Curves.easeOutCubic))),
+            child: child,
+          ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
         title: const Text(
           'Cameras',
           style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
           ),
         ),
-        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: AppSizes.paddingMedium, top: 8, bottom: 8),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.textPrimary.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black87),
-            onPressed: () {},
+          Padding(
+            padding: const EdgeInsets.only(right: AppSizes.paddingMedium, top: 8, bottom: 8),
+            child: Container(
+              width: 40,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textPrimary.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.more_vert_rounded,
+                color: AppColors.textPrimary,
+                size: 22,
+              ),
+            ),
           ),
         ],
       ),
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSizes.paddingLarge),
             _buildCamerasHeader(),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSizes.paddingMedium),
             _buildCamerasGrid(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -79,15 +135,15 @@ class _MobileDevicesPageState extends State<MobileDevicesPage> {
   // ================= CAMERAS HEADER =================
   Widget _buildCamerasHeader() {
     return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Live Feeds',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-          ),
-        ],
+      padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingMedium),
+      child: Text(
+        'Live Feeds',
+        style: TextStyle(
+          fontSize: AppSizes.fontXXLarge, 
+          fontWeight: FontWeight.w800,
+          color: AppColors.textPrimary,
+          letterSpacing: -0.5,
+        ),
       ),
     );
   }
@@ -95,16 +151,16 @@ class _MobileDevicesPageState extends State<MobileDevicesPage> {
   // ================= GRID CAMERAS =================
   Widget _buildCamerasGrid() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingMedium),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: cameras.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.9,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.85,
         ),
         itemBuilder: (context, index) {
           return _buildCameraCard(index);
@@ -117,25 +173,63 @@ class _MobileDevicesPageState extends State<MobileDevicesPage> {
   Widget _buildCameraCard(int index) {
     final camera = cameras[index];
 
-    return GestureDetector(
-      onTap: () => _showVideoDialog(camera['videoUrl']!, camera['name']!),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[300]!, width: 1.5),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.videocam, size: 48, color: Color(0xFF2563EB)),
-            const SizedBox(height: 12),
-            Text(
-              camera['name']!,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textPrimary.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showVideoDialog(camera['videoUrl']!, camera['name']!),
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.videocam_rounded, 
+                    size: 32, 
+                    color: AppColors.primary
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  camera['name']!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16, 
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Connected',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.success,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -193,19 +287,22 @@ class _VideoDialogState extends State<VideoDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Colors.transparent,
       insetPadding: _isFullScreen
           ? EdgeInsets.zero
           : const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        width: _isFullScreen ? MediaQuery.of(context).size.width : null,
-        height: _isFullScreen ? MediaQuery.of(context).size.height : null,
+      child: Container(
+        decoration: BoxDecoration(
+          color: _isFullScreen ? Colors.black : AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(_isFullScreen ? 0 : 28),
+        ),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (!_isFullScreen)
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -213,17 +310,19 @@ class _VideoDialogState extends State<VideoDialog> {
                       widget.cameraName,
                       style: const TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.5,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: const Icon(Icons.close_rounded, color: AppColors.textPrimary),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
                 ),
               ),
-            Expanded(child: _buildRoomVideo()),
+            Flexible(child: _buildRoomVideo()),
           ],
         ),
       ),
@@ -232,10 +331,8 @@ class _VideoDialogState extends State<VideoDialog> {
 
   // ================= VIDEO =================
   Widget _buildRoomVideo() {
-    return ClipRRect(
-      borderRadius: _isFullScreen
-          ? BorderRadius.zero
-          : const BorderRadius.all(Radius.circular(16)),
+    return AspectRatio(
+      aspectRatio: 16 / 9,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         color: Colors.black,
@@ -263,8 +360,8 @@ class _VideoDialogState extends State<VideoDialog> {
                       iconSize: 56,
                       icon: Icon(
                         _videoController!.value.isPlaying
-                            ? Icons.pause_circle_filled
-                            : Icons.play_circle_fill,
+                            ? Icons.pause_circle_filled_rounded
+                            : Icons.play_circle_fill_rounded,
                         color: Colors.white70,
                       ),
                       onPressed: () {
@@ -282,8 +379,8 @@ class _VideoDialogState extends State<VideoDialog> {
                     child: IconButton(
                       icon: Icon(
                         _isFullScreen
-                            ? Icons.fullscreen_exit
-                            : Icons.fullscreen,
+                            ? Icons.fullscreen_exit_rounded
+                            : Icons.fullscreen_rounded,
                         color: Colors.white,
                       ),
                       onPressed: _toggleFullScreen,
@@ -292,7 +389,7 @@ class _VideoDialogState extends State<VideoDialog> {
                 ],
               )
             : const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: CircularProgressIndicator(color: AppColors.primary),
               ),
       ),
     );

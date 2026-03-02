@@ -1,118 +1,79 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:thuctap/features/location/data/models/device_location_model.dart';
+import 'package:thuctap/features/location/data/room_service.dart';
+import 'package:thuctap/core/constants/app_strings.dart';
+import 'package:thuctap/core/constants/app_colors.dart';
+import 'package:thuctap/core/constants/app_sizes.dart';
 import '../widgets/mobile/mobile_location_map.dart';
 
-class MobileLocationPage extends StatefulWidget {
-  const MobileLocationPage({super.key});
+class MobileLocationPage extends ConsumerStatefulWidget {
+  final String? initialRoom;
+  const MobileLocationPage({super.key, this.initialRoom});
 
   @override
-  State<MobileLocationPage> createState() => _MobileLocationPageState();
+  ConsumerState<MobileLocationPage> createState() => _MobileLocationPageState();
 }
 
-class _MobileLocationPageState extends State<MobileLocationPage> {
-  late List<DeviceLocationModel> devices;
-  String selectedRoom = 'Master Bedroom';
+class _MobileLocationPageState extends ConsumerState<MobileLocationPage> {
+  List<DeviceLocationModel> devices = [];
+  late String selectedRoom;
+  bool isLoading = false;
 
-  Map<String, List<DeviceLocationModel>> roomDevices = {
-    'Master Bedroom': [
-      DeviceLocationModel(
-        id: '1',
-        name: 'Air Condition',
-        roomId: 'bedroom',
-        x: 20,
-        y: 30,
-        status: 'Connected',
-        isOn: true,
-        icon: 'ac',
-      ),
-      DeviceLocationModel(
-        id: '2',
-        name: 'Lamp Light',
-        roomId: 'bedroom',
-        x: 70,
-        y: 25,
-        status: 'Connected',
-        isOn: false,
-        icon: 'lamp',
-      ),
-      DeviceLocationModel(
-        id: '3',
-        name: 'Ceiling Fan',
-        roomId: 'bedroom',
-        x: 50,
-        y: 50,
-        status: 'Connected',
-        isOn: true,
-        icon: 'fan',
-      ),
-    ],
-    'Kitchen': [
-      DeviceLocationModel(
-        id: '4',
-        name: 'Kitchen Light',
-        roomId: 'kitchen',
-        x: 30,
-        y: 40,
-        status: 'Connected',
-        isOn: true,
-        icon: 'light',
-      ),
-      DeviceLocationModel(
-        id: '5',
-        name: 'Oven',
-        roomId: 'kitchen',
-        x: 70,
-        y: 60,
-        status: 'Connected',
-        isOn: false,
-        icon: 'oven',
-      ),
-    ],
-    'Living Room': [
-      DeviceLocationModel(
-        id: '6',
-        name: 'TV',
-        roomId: 'living',
-        x: 50,
-        y: 35,
-        status: 'Connected',
-        isOn: true,
-        icon: 'tv',
-      ),
-      DeviceLocationModel(
-        id: '7',
-        name: 'Speaker',
-        roomId: 'living',
-        x: 25,
-        y: 70,
-        status: 'Disconnected',
-        isOn: false,
-        icon: 'speaker',
-      ),
-    ],
-  };
+  // Mock initial structure for room tabs
+  final List<String> availableRooms = [
+    AppStrings.bedRoom,
+    AppStrings.livingRoom,
+    'Kitchen',
+    AppStrings.studyRoom,
+    AppStrings.guestRoom,
+  ];
 
   final Map<String, String> roomImages = {
-    'Master Bedroom':
+    AppStrings.bedRoom:
         'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500',
     'Kitchen':
         'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500',
-    'Living Room':
+    AppStrings.livingRoom:
         'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500',
+    AppStrings.studyRoom:
+        'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=500',
+    AppStrings.guestRoom:
+        'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=500',
   };
 
   @override
   void initState() {
     super.initState();
-    devices = roomDevices[selectedRoom] ?? [];
+    selectedRoom = widget.initialRoom ?? AppStrings.bedRoom;
+    if (!availableRooms.contains(selectedRoom)) {
+      selectedRoom = availableRooms.first;
+    }
+    _fetchDevices(selectedRoom);
+  }
+
+  Future<void> _fetchDevices(String roomName) async {
+    setState(() => isLoading = true);
+    try {
+      final fetchedDevices = await ref.read(roomServiceProvider).getDevicesByRoom(roomName);
+      if (mounted) {
+        setState(() {
+          devices = fetchedDevices;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 
   void _changeRoom(String roomName) {
-    setState(() {
-      selectedRoom = roomName;
-      devices = roomDevices[roomName] ?? [];
-    });
+    if (selectedRoom == roomName) return;
+    setState(() => selectedRoom = roomName);
+    _fetchDevices(roomName);
   }
 
   void _toggleDeviceState(DeviceLocationModel device) {
@@ -146,8 +107,8 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
         isOn: false,
         icon: 'default',
       );
-      roomDevices[selectedRoom]!.add(newDevice);
-      devices = roomDevices[selectedRoom]!;
+      devices.add(newDevice);
+      devices = List.from(devices);
     });
   }
 
@@ -157,26 +118,38 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Add New Device'),
+          backgroundColor: AppColors.surfaceLight,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Add New Device', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
           content: TextField(
             controller: deviceNameController,
-            decoration: const InputDecoration(hintText: "Enter device name"),
+            decoration: InputDecoration(
+              hintText: "Enter device name",
+              filled: true,
+              fillColor: AppColors.background,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
             ),
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
               onPressed: () {
                 if (deviceNameController.text.isNotEmpty) {
                   _addNewDevice(deviceNameController.text);
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Add'),
+              child: const Text('Add', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -187,20 +160,44 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
         title: const Text(
           'Home Location',
           style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
           ),
         ),
-        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: AppSizes.paddingMedium, top: 8, bottom: 8),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.textPrimary.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -208,29 +205,42 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              physics: const BouncingScrollPhysics(),
               child: Row(
-                children: roomDevices.keys.map((roomName) {
+                children: availableRooms.map((roomName) {
                   final isSelected = selectedRoom == roomName;
                   return GestureDetector(
                     onTap: () => _changeRoom(roomName),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.only(right: 12),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 20,
+                        vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? const Color(0xFF2563EB)
-                            : Colors.grey[200],
+                        color: isSelected ? AppColors.primary : AppColors.surfaceLight,
                         borderRadius: BorderRadius.circular(20),
+                        boxShadow: isSelected ? [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.25),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          )
+                        ] : [
+                          BoxShadow(
+                            color: AppColors.textPrimary.withValues(alpha: 0.03),
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          )
+                        ],
                       ),
                       child: Text(
                         roomName,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black87,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                          color: isSelected ? Colors.white : AppColors.textSecondary,
+                          fontSize: 14,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                         ),
                       ),
                     ),
@@ -241,12 +251,14 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
             // Map Section
             Padding(
               padding: const EdgeInsets.all(16),
-              child: MobileLocationMap(
-                devices: devices,
-                roomImage: roomImages[selectedRoom] ??
-                    'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500',
-                onDeviceTap: _toggleDeviceState,
-              ),
+              child: isLoading 
+                ? const SizedBox(height: 300, child: Center(child: CircularProgressIndicator()))
+                : MobileLocationMap(
+                    devices: devices,
+                    roomImage: roomImages[selectedRoom] ??
+                        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500',
+                    onDeviceTap: _toggleDeviceState,
+                  ),
             ),
             // Devices List
             Padding(
@@ -260,36 +272,38 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
                       const Text(
                         'Devices in this room',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.5,
                         ),
                       ),
-                      GestureDetector(
+                      InkWell(
                         onTap: _showAddDeviceDialog,
+                        borderRadius: BorderRadius.circular(16),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
-                            vertical: 6,
+                            vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2563EB),
-                            borderRadius: BorderRadius.circular(20),
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Row(
                             children: [
                               Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 16,
+                                Icons.add_rounded,
+                                color: AppColors.primary,
+                                size: 18,
                               ),
                               SizedBox(width: 4),
                               Text(
-                                'Add Device',
+                                'Add',
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
@@ -298,37 +312,43 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   ...List.generate(devices.length, (index) {
                     final device = devices[index];
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[200]!),
+                        color: AppColors.surfaceLight,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.textPrimary.withValues(alpha: 0.05),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
                           Container(
-                            width: 40,
-                            height: 40,
+                            width: 48,
+                            height: 48,
                             decoration: BoxDecoration(
                               color: device.isOn
-                                  ? const Color(0xFF2563EB).withOpacity(0.1)
-                                  : Colors.grey[200],
-                              borderRadius: BorderRadius.circular(8),
+                                  ? AppColors.primary.withValues(alpha: 0.1)
+                                  : AppColors.surfaceGray,
+                              shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              Icons.devices,
+                              Icons.devices_rounded,
                               color: device.isOn
-                                  ? const Color(0xFF2563EB)
-                                  : Colors.grey[500],
-                              size: 20,
+                                  ? AppColors.primary
+                                  : AppColors.textLight,
+                              size: 24,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,26 +356,30 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
                                 Text(
                                   device.name,
                                   style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                    letterSpacing: -0.3,
                                   ),
                                 ),
+                                const SizedBox(height: 2),
                                 Text(
                                   device.status,
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
                                     color: device.status == 'Connected'
-                                        ? Colors.green
-                                        : Colors.red,
+                                        ? AppColors.success
+                                        : AppColors.error,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          GestureDetector(
-                            onTap: device.status == 'Connected'
-                                ? () {
+                          Switch(
+                            value: device.isOn,
+                            onChanged: device.status == 'Connected'
+                                ? (val) {
                                     setState(() {
                                       devices[index] = DeviceLocationModel(
                                         id: device.id,
@@ -364,40 +388,19 @@ class _MobileLocationPageState extends State<MobileLocationPage> {
                                         x: device.x,
                                         y: device.y,
                                         status: device.status,
-                                        isOn: !device.isOn,
+                                        isOn: val,
                                         icon: device.icon,
                                       );
                                     });
                                   }
                                 : null,
-                            child: Container(
-                              width: 50,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                color: device.isOn
-                                    ? const Color(0xFF2563EB).withOpacity(0.2)
-                                    : Colors.grey[300],
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  device.isOn ? 'On' : 'Off',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: device.isOn
-                                        ? const Color(0xFF2563EB)
-                                        : Colors.grey[600],
-                                  ),
-                                ),
-                              ),
-                            ),
+                            activeColor: AppColors.success,
                           ),
                         ],
                       ),
                     );
                   }).toList(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 100),
                 ],
               ),
             ),

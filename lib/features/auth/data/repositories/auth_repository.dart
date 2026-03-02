@@ -12,4 +12,12 @@ class AuthRepository {
   }) {
     return _authApi.signIn(email: email, password: password);
   }
+
+  Future<void> signUp({
+    required String name,
+    required String email,
+    required String password,
+  }) {
+    return _authApi.signUp(name: name, email: email, password: password);
+  }
 }

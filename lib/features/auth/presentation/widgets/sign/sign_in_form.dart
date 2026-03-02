@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../core/widgets/app_button.dart';
 import '../../../../../core/widgets/app_text_field.dart';
+import '../../../../../core/constants/app_colors.dart';
 import '../../../data/models/auth_session.dart';
 import '../../login_controller.dart';
 import 'social_buttons.dart';
@@ -21,8 +22,8 @@ class _SignInFormState extends ConsumerState<SignInForm> {
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController(text: 'demo@example.com');
-    _passwordController = TextEditingController(text: '123456');
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
   }
 
   @override
@@ -37,129 +38,124 @@ class _SignInFormState extends ConsumerState<SignInForm> {
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
 
-    ref.listen<AsyncValue<AuthSession?>>(authControllerProvider, (
-      previous,
-      next,
-    ) {
+    ref.listen<AsyncValue<AuthSession?>>(authControllerProvider, (previous, next) {
       final currentError = next.error;
       if (currentError != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(currentError.toString())));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(currentError.toString())));
       }
-
-      final wasSignedOut = previous?.valueOrNull == null;
-      final isSignedIn = next.valueOrNull != null;
-      if (wasSignedOut && isSignedIn) {
+      if (previous?.valueOrNull == null && next.valueOrNull != null) {
         context.go('/');
       }
     });
 
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Title
-          const Text(
-            "Sign In",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          const Center(
+            child: Icon(Icons.hub_rounded, size: 64, color: AppColors.primary),
           ),
-
           const SizedBox(height: 24),
-
-          /// Email
-          const Text("Email", style: TextStyle(fontSize: 14)),
+          const Center(
+            child: Text(
+              "Welcome Back",
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -1),
+            ),
+          ),
           const SizedBox(height: 8),
+          const Center(
+            child: Text(
+              "Sign in to continue managing your home",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textSecondary),
+            ),
+          ),
+          const SizedBox(height: 32),
+          _buildFieldLabel("Email Address"),
           AppTextField(hint: "example@gmail.com", controller: _emailController),
-
-          const SizedBox(height: 12),
-
-          /// Password
-          const Text("Password", style: TextStyle(fontSize: 14)),
-          const SizedBox(height: 8),
-          AppTextField(
-            hint: "********",
-            isPassword: true,
-            controller: _passwordController,
-          ),
-
-          const SizedBox(height: 12),
-
-          /// Forgot password
-          Text(
-            "Forgot Password?",
-            style: TextStyle(color: Colors.blue.shade600, fontSize: 13),
-          ),
-
           const SizedBox(height: 20),
-
-          /// Sign In button
+          _buildFieldLabel("Password"),
+          AppTextField(hint: "********", isPassword: true, controller: _passwordController),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {},
+              child: const Text(
+                "Forgot Password?",
+                style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w700, fontSize: 13),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           AppButton(
             text: isLoading ? "Signing in..." : "Sign In",
-            onTap: isLoading
-                ? null
-                : () {
-                    ref
-                        .read(authControllerProvider.notifier)
-                        .signIn(
-                          email: _emailController.text.trim(),
-                          password: _passwordController.text.trim(),
-                        );
-                  },
-          ),
-          const SizedBox(height: 8),
-
-          /// Go to Home button
-          AppButton(
-            text: "Go to Home",
-            onTap: () {
-              context.go('/');
+            onTap: isLoading ? null : () {
+              ref.read(authControllerProvider.notifier).signIn(
+                email: _emailController.text.trim(),
+                password: _passwordController.text.trim(),
+              );
             },
           ),
-
-          const SizedBox(height: 20),
-
-          /// OR divider
-          Row(
-            children: const [
-              Expanded(child: Divider(thickness: 1)),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Text("Or"),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: OutlinedButton(
+              onPressed: () => context.go('/'),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppColors.primary, width: 1.5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              Expanded(child: Divider(thickness: 1)),
+              child: const Text(
+                "Go to Home (Bypass)",
+                style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w700, fontSize: 16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              const Expanded(child: Divider(thickness: 1, color: AppColors.borderColor)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text("Or", style: TextStyle(color: AppColors.textLight, fontWeight: FontWeight.w600)),
+              ),
+              const Expanded(child: Divider(thickness: 1, color: AppColors.borderColor)),
             ],
           ),
-
-          const SizedBox(height: 20),
-
-          /// Social buttons
+          const SizedBox(height: 16),
           const SocialButtons(),
-
-          const SizedBox(height: 20),
-
-          /// Sign up link
+          const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(" "),
+              const Text(
+                "Don't have an account? ",
+                style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+              ),
               GestureDetector(
-                onTap: () {
-                  context.go('/sign-up');
-                },
+                onTap: () => context.go('/sign-up'),
                 child: const Text(
                   'Sign Up',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800),
                 ),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFieldLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
       ),
     );
   }

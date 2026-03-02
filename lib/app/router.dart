@@ -51,10 +51,11 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/rooms',
           builder: (context, state) {
+            final roomName = state.uri.queryParameters['roomName'];
             return ResponsiveLayout(
-              mobile: MobileLocationPage(),
-              tablet: DesktopLocationPage(),
-              web: DesktopLocationPage(),
+              mobile: MobileLocationPage(initialRoom: roomName),
+              tablet: DesktopLocationPage(initialRoomName: roomName),
+              web: DesktopLocationPage(initialRoomName: roomName),
             );
           },
         ),

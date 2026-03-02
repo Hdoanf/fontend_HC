@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/app_colors.dart';
 
 class AppButton extends StatelessWidget {
   final String text;
@@ -10,14 +11,20 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 48,
+      height: 52,
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(255, 33, 58, 243),
+          backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shadowColor: AppColors.primary.withValues(alpha: 0.3),
         ),
-        child: Text(text),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: -0.3),
+        ),
       ),
     );
   }

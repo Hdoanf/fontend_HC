@@ -21,9 +21,10 @@ class FrequentlyUsedSection extends StatelessWidget {
               const Text(
                 AppStrings.frequentlyUsed,
                 style: TextStyle(
-                  fontSize: AppSizes.fontXLarge,
-                  fontWeight: FontWeight.bold,
+                  fontSize: AppSizes.fontXXLarge,
+                  fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
+                  letterSpacing: -0.5,
                 ),
               ),
               GestureDetector(
@@ -35,26 +36,26 @@ class FrequentlyUsedSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: AppSizes.fontMedium,
                     color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSizes.paddingMedium),
-          DeviceCard(
+          const DeviceCard(
             deviceName: AppStrings.airCondition,
             status: AppStrings.connected,
             isConnected: true,
-            icon: Icons.air,
+            icon: Icons.ac_unit_rounded,
             initialIsOn: true,
           ),
-          const SizedBox(height: AppSizes.paddingMedium),
-          DeviceCard(
+          const SizedBox(height: 16),
+          const DeviceCard(
             deviceName: AppStrings.ceilingFan,
             status: AppStrings.disconnected,
             isConnected: true,
-            icon: Icons.wind_power,
+            icon: Icons.mode_fan_off_rounded,
             initialIsOn: false,
           ),
         ],

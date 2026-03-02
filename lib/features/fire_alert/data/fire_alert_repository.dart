@@ -25,7 +25,7 @@ class FireAlertRepository {
 
   Stream<FireEvent> watchRealtimeAlerts() {
     return Stream<FireEvent>.periodic(
-      const Duration(seconds: 10),
+      const Duration(minutes: 3),
       (_) => _generateEvent(),
     );
   }

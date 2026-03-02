@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:thuctap/app/providers.dart';
 import '../../data/data_sources/auth_api.dart';
 import '../../data/models/auth_session.dart';
 import '../../data/repositories/auth_repository.dart';
 
-final authApiProvider = Provider<AuthApi>((ref) => AuthApi());
+final authApiProvider =
+    Provider<AuthApi>((ref) => AuthApi(ref.read(apiClientProvider)));
 
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(ref.read(authApiProvider)),

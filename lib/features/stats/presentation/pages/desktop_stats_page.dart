@@ -49,7 +49,7 @@ class _StatEnergyPageState extends State<StatEnergyPage> {
       case EnergyFilter.month:
         return List.generate(
           12,
-              (i) => EnergyPoint('M${i + 1}', (i + 1) * 4),
+          (i) => EnergyPoint('M${i + 1}', (i + 1) * 4),
         );
     }
   }
@@ -65,7 +65,7 @@ class _StatEnergyPageState extends State<StatEnergyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceLight,
+      backgroundColor: AppColors.background,
       body: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -75,7 +75,7 @@ class _StatEnergyPageState extends State<StatEnergyPage> {
               filter: filter,
               onChanged: (f) => setState(() => filter = f),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             Expanded(
               child: Row(
                 children: [
@@ -83,7 +83,7 @@ class _StatEnergyPageState extends State<StatEnergyPage> {
                     flex: 4,
                     child: _EnergyChart(data: chartData),
                   ),
-                  const SizedBox(width: 24),
+                  const SizedBox(width: 32),
                   Expanded(
                     flex: 2,
                     child: _DeviceEnergyList(devices: devices),
@@ -115,23 +115,42 @@ class _Header extends StatelessWidget {
       children: [
         const Text(
           'Energy Statistics',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5),
         ),
         const Spacer(),
-        _FilterButton(
-          label: 'Day',
-          active: filter == EnergyFilter.day,
-          onTap: () => onChanged(EnergyFilter.day),
-        ),
-        _FilterButton(
-          label: 'Week',
-          active: filter == EnergyFilter.week,
-          onTap: () => onChanged(EnergyFilter.week),
-        ),
-        _FilterButton(
-          label: 'Month',
-          active: filter == EnergyFilter.month,
-          onTap: () => onChanged(EnergyFilter.month),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceLight,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textPrimary.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _FilterButton(
+                label: 'Day',
+                active: filter == EnergyFilter.day,
+                onTap: () => onChanged(EnergyFilter.day),
+              ),
+              _FilterButton(
+                label: 'Week',
+                active: filter == EnergyFilter.week,
+                onTap: () => onChanged(EnergyFilter.week),
+              ),
+              _FilterButton(
+                label: 'Month',
+                active: filter == EnergyFilter.month,
+                onTap: () => onChanged(EnergyFilter.month),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -153,26 +172,23 @@ class _FilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-          decoration: BoxDecoration(
-            color: active ? AppColors.primary : Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: const [
-              BoxShadow(color: Colors.black12, blurRadius: 8),
-            ],
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: active ? Colors.white : AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: active ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: active ? [
+            BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))
+          ] : [],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: active ? Colors.white : AppColors.textSecondary,
+            fontWeight: active ? FontWeight.w800 : FontWeight.w600,
           ),
         ),
       ),
@@ -187,20 +203,19 @@ class _EnergyChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxValue =
-    data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+    final maxValue = data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
 
-    const double chartHeight = 320;
+    const double chartHeight = 400;
     const double labelHeight = 36;
     final double barMaxHeight = chartHeight - labelHeight;
 
     return Container(
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 20),
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(color: AppColors.textPrimary.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 8)),
         ],
       ),
       child: Column(
@@ -208,9 +223,9 @@ class _EnergyChart extends StatelessWidget {
         children: [
           const Text(
             'Energy Usage (kWh)',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
           /// ===== CHART =====
           SizedBox(
@@ -222,61 +237,58 @@ class _EnergyChart extends StatelessWidget {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(5, (i) {
-                    final value =
-                    (maxValue * (4 - i) / 4).round();
+                    final value = (maxValue * (4 - i) / 4).round();
                     return Text(
                       value.toString(),
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textSecondary,
                       ),
                     );
                   }),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
 
                 /// ===== BARS =====
                 Expanded(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: data.map((e) {
-                      final targetHeight =
-                          (e.value / maxValue) * barMaxHeight;
+                      final targetHeight = (e.value / maxValue) * barMaxHeight;
 
                       return Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             TweenAnimationBuilder<double>(
-                              tween: Tween(
-                                begin: 0,
-                                end: targetHeight,
-                              ),
-                              duration:
-                              const Duration(milliseconds: 600),
+                              tween: Tween(begin: 0, end: targetHeight),
+                              duration: const Duration(milliseconds: 600),
                               curve: Curves.easeOutCubic,
                               builder: (context, value, _) {
                                 return Container(
                                   height: value,
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 8),
+                                  margin: const EdgeInsets.symmetric(horizontal: 16),
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary,
-                                    borderRadius:
-                                    BorderRadius.circular(16),
+                                    gradient: const LinearGradient(
+                                      colors: [AppColors.primary, Color(0xFF5D7EFF)],
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                    ),
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
                                 );
                               },
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 12),
                             SizedBox(
                               height: 20,
                               child: Text(
                                 e.label,
                                 style: const TextStyle(
-                                  fontSize: 12,
-                                  color:
-                                  AppColors.textSecondary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
                             ),
@@ -304,39 +316,49 @@ class _DeviceEnergyList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 20),
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(color: AppColors.textPrimary.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 8)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Devices',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            'Devices Top Usage',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Expanded(
             child: ListView.separated(
+              physics: const BouncingScrollPhysics(),
               itemCount: devices.length,
-              separatorBuilder: (_, __) => const Divider(height: 24),
+              separatorBuilder: (_, __) => const Divider(color: AppColors.borderColor, height: 32),
               itemBuilder: (_, i) {
                 final d = devices[i];
                 return Row(
                   children: [
-                    const Icon(
-                      Icons.electrical_services,
-                      color: AppColors.primary,
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.electrical_services_rounded, color: AppColors.primary, size: 24),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(d.name)),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        d.name,
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.textPrimary),
+                      )
+                    ),
                     Text(
                       '${d.energy.toStringAsFixed(1)} kWh',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.primary),
                     ),
                   ],
                 );

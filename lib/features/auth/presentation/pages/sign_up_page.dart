@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thuctap/features/auth/presentation/widgets/sign/sign_up_form.dart';
 import '../../../../core/utils/responsive_layout.dart';
-import '../widgets/sign/sign_in_form.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -9,21 +9,13 @@ class SignUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: ResponsiveLayout(
         /// 📱 MOBILE
-        mobile: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Center(child: SignUpForm()),
-              ),
-            );
-          },
-        ),
+        mobile: const _MobileAuthScaffold(child: SignUpForm()),
 
         /// 📱 TABLET
-        tablet: Center(child: SizedBox(width: 420, child: SignUpForm())),
+        tablet: const _MobileAuthScaffold(child: SignUpForm()),
 
         /// 🌐 WEB
         web: Row(
@@ -31,17 +23,79 @@ class SignUpPage extends StatelessWidget {
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(
-                      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f',
+                  gradient: LinearGradient(
+                    colors: [AppColors.primary, Color(0xFF5D7EFF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: const Center(
+                  child: Icon(Icons.hub_rounded, size: 100, color: Colors.white),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Container(
+                color: AppColors.background,
+                child: Center(
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 520),
+                    margin: const EdgeInsets.symmetric(horizontal: 48),
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceLight,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.textPrimary.withValues(alpha: 0.1),
+                          blurRadius: 30,
+                          offset: const Offset(0, 15),
+                        ),
+                      ],
                     ),
-                    fit: BoxFit.cover,
+                    child: const SignUpForm(),
                   ),
                 ),
               ),
             ),
-            SizedBox(width: 420, child: Center(child: SignInForm())),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MobileAuthScaffold extends StatelessWidget {
+  const _MobileAuthScaffold({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.background,
+      child: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.all(24),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 520),
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textPrimary.withValues(alpha: 0.08),
+                    blurRadius: 40,
+                    offset: const Offset(0, 20),
+                  ),
+                ],
+              ),
+              child: child,
+            ),
+          ),
         ),
       ),
     );

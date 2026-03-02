@@ -1,17 +1,19 @@
+import '../../home/data/models/home_models.dart';
+
 class DeviceState {
   const DeviceState({
     this.isLoading = false,
-    this.devices = const <String>[],
+    this.devices = const <DeviceModel>[],
     this.errorMessage,
   });
 
   final bool isLoading;
-  final List<String> devices;
+  final List<DeviceModel> devices;
   final String? errorMessage;
 
   DeviceState copyWith({
     bool? isLoading,
-    List<String>? devices,
+    List<DeviceModel>? devices,
     String? errorMessage,
   }) {
     return DeviceState(

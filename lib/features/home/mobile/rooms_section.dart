@@ -19,25 +19,29 @@ class _RoomsSectionState extends State<RoomsSection> {
       'roomName': AppStrings.bedRoom,
       'roomDetails': AppStrings.fiveRooms,
       'backgroundColor': AppColors.roomCardBed,
-      'image': 'https://img.icons8.com/color/96/sofa.png',
+      'iconColor': const Color(0xFF9D63F4),
+      'image': 'https://img.icons8.com/fluency/96/bed.png',
     },
     {
       'roomName': AppStrings.livingRoom,
       'roomDetails': AppStrings.twoRooms,
       'backgroundColor': AppColors.roomCardLiving,
-      'image': 'https://img.icons8.com/color/240/living-room.png',
+      'iconColor': const Color(0xFF488AFA),
+      'image': 'https://img.icons8.com/fluency/96/living-room.png',
     },
     {
       'roomName': AppStrings.studyRoom,
       'roomDetails': AppStrings.oneRoom,
       'backgroundColor': AppColors.roomCardStudy,
-      'image': 'https://img.icons8.com/color/240/living-room.png',
+      'iconColor': const Color(0xFFF4A845),
+      'image': 'https://img.icons8.com/fluency/96/desk.png',
     },
     {
       'roomName': AppStrings.guestRoom,
       'roomDetails': AppStrings.twoRooms,
       'backgroundColor': AppColors.roomCardGuest,
-      'image': 'https://img.icons8.com/color/240/living-room.png',
+      'iconColor': const Color(0xFF2EBA9B),
+      'image': 'https://img.icons8.com/fluency/96/armchair.png',
     },
   ];
 
@@ -45,9 +49,10 @@ class _RoomsSectionState extends State<RoomsSection> {
     setState(() {
       _rooms.add({
         'roomName': roomName,
-        'roomDetails': '1 devices',
-        'backgroundColor': AppColors.roomCardGuest,
-        'image': 'https://img.icons8.com/color/240/living-room.png',
+        'roomDetails': '0 devices',
+        'backgroundColor': AppColors.roomCardBed,
+        'iconColor': AppColors.primary,
+        'image': 'https://img.icons8.com/fluency/96/room.png',
       });
     });
   }
@@ -58,26 +63,38 @@ class _RoomsSectionState extends State<RoomsSection> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Add New Room'),
+          backgroundColor: AppColors.surfaceLight,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Add New Room', style: TextStyle(fontWeight: FontWeight.bold)),
           content: TextField(
             controller: roomNameController,
-            decoration: const InputDecoration(hintText: "Enter room name"),
+            decoration: InputDecoration(
+              hintText: "Enter room name",
+              filled: true,
+              fillColor: AppColors.background,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
             ),
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
               onPressed: () {
                 if (roomNameController.text.isNotEmpty) {
                   _addNewRoom(roomNameController.text);
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Add'),
+              child: const Text('Add', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -97,35 +114,37 @@ class _RoomsSectionState extends State<RoomsSection> {
               const Text(
                 AppStrings.myRooms,
                 style: TextStyle(
-                  fontSize: AppSizes.fontXLarge,
-                  fontWeight: FontWeight.bold,
+                  fontSize: AppSizes.fontXXLarge,
+                  fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
+                  letterSpacing: -0.5,
                 ),
               ),
-              GestureDetector(
+              InkWell(
                 onTap: _showAddRoomDialog,
+                borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: AppSizes.paddingMedium,
-                    vertical: AppSizes.paddingSmall,
+                    horizontal: 12,
+                    vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
                   ),
                   child: Row(
                     children: [
                       const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: AppSizes.iconMedium,
+                        Icons.add_rounded,
+                        color: AppColors.primary,
+                        size: 20,
                       ),
-                      const SizedBox(width: AppSizes.paddingSmall),
+                      const SizedBox(width: 4),
                       const Text(
                         AppStrings.addNew,
                         style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
                           fontSize: AppSizes.fontMedium,
                         ),
                       ),
@@ -139,9 +158,9 @@ class _RoomsSectionState extends State<RoomsSection> {
           GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: AppSizes.paddingMedium,
-              mainAxisSpacing: AppSizes.paddingMedium,
-              childAspectRatio: 0.8,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.85,
             ),
             itemCount: _rooms.length,
             shrinkWrap: true,
@@ -152,8 +171,10 @@ class _RoomsSectionState extends State<RoomsSection> {
                 roomName: room['roomName'],
                 roomDetails: room['roomDetails'],
                 backgroundColor: room['backgroundColor'],
+                iconColor: room['iconColor'] ?? AppColors.primary,
                 image: room['image'],
-                onTap: () => GoRouter.of(context).go('/devices'),
+                onTap: () => GoRouter.of(context)
+                    .go('/rooms?roomName=${Uri.encodeComponent(room['roomName'])}'),
               );
             },
           ),

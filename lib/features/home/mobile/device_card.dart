@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thuctap/core/constants/app_colors.dart';
 import 'package:thuctap/core/constants/app_sizes.dart';
+import 'device_toggle.dart';
 
 class DeviceCard extends StatefulWidget {
   final String deviceName;
@@ -36,30 +37,39 @@ class _DeviceCardState extends State<DeviceCard> {
     final bool active = _isOn && widget.isConnected;
 
     return Container(
-      padding: const EdgeInsets.all(AppSizes.paddingMedium),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: active ? AppColors.primary : AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
+        color: active ? AppColors.primary : AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: active
+                ? AppColors.primary.withValues(alpha: 0.3)
+                : AppColors.textPrimary.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
           /// ICON
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: active
-                  ? Colors.white.withOpacity(0.2)
-                  : Colors.grey.withOpacity(0.15),
+                  ? Colors.white.withValues(alpha: 0.2)
+                  : AppColors.primary.withValues(alpha: 0.08),
             ),
             child: Icon(
               widget.icon,
-              size: AppSizes.iconMedium,
-              color: active ? Colors.white : Colors.grey,
+              size: 26,
+              color: active ? Colors.white : AppColors.primary,
             ),
           ),
 
-          const SizedBox(width: AppSizes.paddingMedium),
+          const SizedBox(width: 16),
 
           /// TEXT
           Expanded(
@@ -69,36 +79,34 @@ class _DeviceCardState extends State<DeviceCard> {
                 Text(
                   widget.deviceName,
                   style: TextStyle(
-                    fontSize: AppSizes.fontLarge,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                     color: active ? Colors.white : AppColors.textPrimary,
+                    letterSpacing: -0.3,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   widget.status,
                   style: TextStyle(
-                    fontSize: AppSizes.fontSmall,
-                    color: active ? Colors.white70 : AppColors.textSecondary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: active ? Colors.white.withValues(alpha: 0.8) : AppColors.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
 
-          /// SWITCH (🔥 BẬT/TẮT ĐƯỢC)
-          Switch(
-            value: _isOn,
-            onChanged: widget.isConnected
-                ? (value) {
-                    setState(() {
-                      _isOn = value;
-                    });
-                  }
-                : null, // mất kết nối → disable
-            activeColor: Colors.white,
-            inactiveThumbColor: Colors.grey,
-            inactiveTrackColor: Colors.grey.shade300,
+          /// CUSTOM SWITCH
+          DeviceToggle(
+            isOn: _isOn,
+            isConnected: widget.isConnected,
+            onChanged: (value) {
+              setState(() {
+                _isOn = value;
+              });
+            },
           ),
         ],
       ),

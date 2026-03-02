@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:thuctap/core/constants/app_colors.dart';
 
 class RoomCard extends StatelessWidget {
   final String roomName;
   final String roomDetails;
   final Color backgroundColor;
-  final String image; // URL ảnh mạng
+  final Color iconColor;
+  final String image;
   final VoidCallback? onTap;
 
   const RoomCard({
@@ -12,106 +14,101 @@ class RoomCard extends StatelessWidget {
     required this.roomName,
     required this.roomDetails,
     required this.backgroundColor,
+    required this.iconColor,
     required this.image,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(28),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 160),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(28),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            /// 🔵 Vòng tròn trang trí phía sau ảnh
-            Positioned(
-              top: 12,
-              right: 5,
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textPrimary.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: backgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(10),
+                      child: image.startsWith('http')
+                          ? Image.network(
+                              image,
+                              fit: BoxFit.contain,
+                              color: iconColor,
+                              errorBuilder: (context, error, stack) {
+                                return Icon(Icons.meeting_room, color: iconColor);
+                              },
+                            )
+                          : Image.asset(
+                              image,
+                              fit: BoxFit.contain,
+                              color: iconColor,
+                              errorBuilder: (context, error, stack) {
+                                return Icon(Icons.meeting_room, color: iconColor);
+                              },
+                            ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 16,
+                      color: AppColors.textLight.withValues(alpha: 0.5),
+                    ),
+                  ],
                 ),
-              ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      roomName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      roomDetails,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-
-            /// 🖼 Ảnh phòng (ảnh mạng – có loading + error)
-            Positioned(
-              top: 12,
-              right: 8,
-              child: Image.network(
-                image,
-                width: 110,
-                height: 110,
-                fit: BoxFit.contain,
-
-                /// Loading
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const SizedBox(
-                    width: 110,
-                    height: 110,
-                    child: Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  );
-                },
-
-                /// Error
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox(
-                    width: 110,
-                    height: 110,
-                    child: Icon(
-                      Icons.image_not_supported,
-                      size: 40,
-                      color: Colors.grey,
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            /// 📝 Nội dung chữ
-            Positioned(
-              left: 20,
-              bottom: 20,
-              right: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    roomName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF333333),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    roomDetails,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black.withOpacity(0.55),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

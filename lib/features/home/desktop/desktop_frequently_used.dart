@@ -5,59 +5,57 @@ import 'package:thuctap/core/constants/app_strings.dart';
 import 'package:thuctap/features/home/mobile/device_card.dart';
 
 class FrequentlyUsedSection extends StatelessWidget {
-  const FrequentlyUsedSection({Key? key}) : super(key: key);
+  const FrequentlyUsedSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingMedium),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                AppStrings.frequentlyUsed,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              AppStrings.frequentlyUsed,
+              style: TextStyle(
+                fontSize: AppSizes.fontXXLarge,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+                letterSpacing: -0.5,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                // Handle see all
+              },
+              child: const Text(
+                AppStrings.seeAll,
                 style: TextStyle(
-                  fontSize: AppSizes.fontXLarge,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  fontSize: AppSizes.fontMedium,
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  // Handle see all
-                },
-                child: const Text(
-                  AppStrings.seeAll,
-                  style: TextStyle(
-                    fontSize: AppSizes.fontMedium,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.paddingMedium),
-          DeviceCard(
-            deviceName: AppStrings.airCondition,
-            status: AppStrings.connected,
-            isConnected: true,
-            icon: Icons.air,
-            initialIsOn: true,
-          ),
-          const SizedBox(height: AppSizes.paddingMedium),
-          DeviceCard(
-            deviceName: AppStrings.ceilingFan,
-            status: AppStrings.disconnected,
-            isConnected: true,
-            icon: Icons.wind_power,
-            initialIsOn: false,
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        const DeviceCard(
+          deviceName: AppStrings.airCondition,
+          status: AppStrings.connected,
+          isConnected: true,
+          icon: Icons.ac_unit_rounded,
+          initialIsOn: true,
+        ),
+        const SizedBox(height: 16),
+        const DeviceCard(
+          deviceName: AppStrings.ceilingFan,
+          status: AppStrings.disconnected,
+          isConnected: true,
+          icon: Icons.mode_fan_off_rounded,
+          initialIsOn: false,
+        ),
+      ],
     );
   }
 }

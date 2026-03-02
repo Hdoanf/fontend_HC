@@ -1,0 +1,10 @@
+{"component": "Background", "rule": "AppColors.background (#F4F7FC). Use for all main feature pages."}
+{"component": "AppBar", "rule": "Transparent, no elevation. Custom rounded containers for leading/actions with 0.04 alpha shadow."}
+{"component": "Cards", "rule": "AppColors.surfaceLight (#FFFFFF), borderRadius: 24, boxShadow: blur 15, offset (0, 8), alpha 0.05 textPrimary."}
+{"component": "Typography", "rule": "Titles: fontWeight: w800, letterSpacing: -0.5. Body titles: w700, letterSpacing: -0.3."}
+{"component": "Icons", "rule": "Wrapped in circular containers with AppColors.primary (alpha 0.08-0.15) background."}
+{"component": "Buttons", "rule": "AppButton: borderRadius: 16, height: 52, elevation: 0. ElevatedButton for main actions."}
+{"component": "Inputs", "rule": "AppTextField: borderRadius: 16, filled: true, fillColor: AppColors.background, no border side."}
+{"component": "Toggles", "rule": "Switch activeColor: AppColors.success (#22C55E). Custom DeviceToggle for home devices."}
+{"component": "TabBar", "rule": "Pill-style indicator with AppColors.primary, rounded containers for the bar itself."}
+{"component": "Dialogs", "rule": "BorderRadius: 29, surfaceLight background, centered titles w800."}

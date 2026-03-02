@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/utils/responsive_layout.dart';
-import '../../devices/desktop_devices_page.dart';
-import '../../devices/mobile_devices_page.dart';
+import 'desktop_devices_page.dart';
+import 'mobile_devices_page.dart';
 
 class DeviceScreen extends StatelessWidget {
   const DeviceScreen({super.key});

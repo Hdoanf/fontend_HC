@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:thuctap/features/fire_alert/fire_alert_routes.dart';
 import 'package:thuctap/features/fire_alert/presentation/fire_alert_controller.dart';
 import 'package:thuctap/features/fire_alert/presentation/widgets/fire_alert_banner.dart';
+import 'package:thuctap/core/constants/app_colors.dart';
 
 import '../mobile/bottom_nav_bar.dart';
 
@@ -43,6 +44,7 @@ class DesktopShellPage extends ConsumerWidget {
     });
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: Row(
         children: [
           BottomNavBar(

@@ -22,32 +22,50 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = _isDesktop(context);
 
+    if (isDesktop) {
+      return Container(
+        width: 240,
+        decoration: const BoxDecoration(
+          color: AppColors.desktopSidebar,
+          border: Border(
+            right: BorderSide(color: AppColors.desktopBorderColor, width: 1),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.paddingMedium,
+          vertical: AppSizes.paddingSmall,
+        ),
+        child: _buildSidebar(),
+      );
+    }
+
     return Container(
-      width: isDesktop ? 240 : null,
-      height: isDesktop ? null : 64,
       decoration: BoxDecoration(
-        color: AppColors.background,
-        border: Border(
-          top: isDesktop
-              ? BorderSide.none
-              : BorderSide(color: AppColors.borderColor, width: 1),
-          right: isDesktop
-              ? BorderSide(color: AppColors.borderColor, width: 1)
-              : BorderSide.none,
+        color: AppColors.surfaceLight,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textPrimary.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.paddingMedium,
+            vertical: 12,
+          ),
+          child: _buildBottomBar(),
         ),
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSizes.paddingMedium,
-        vertical: AppSizes.paddingSmall,
-      ),
-      child: isDesktop ? _buildSidebar() : _buildBottomBar(),
     );
   }
 
   /// -------- MOBILE --------
   Widget _buildBottomBar() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: _items(),
     );
   }
@@ -67,44 +85,44 @@ class BottomNavBar extends StatelessWidget {
   List<Widget> _items({bool isSidebar = false}) {
     return [
       _NavBarItem(
-        icon: Icons.home,
+        icon: Icons.home_rounded,
         isSelected: selectedIndex == 0,
         isSidebar: isSidebar,
         onTap: () => onItemSelected(0),
       ),
       _NavBarItem(
-        icon: Icons.devices,
+        icon: Icons.grid_view_rounded,
         isSelected: selectedIndex == 1,
         isSidebar: isSidebar,
         onTap: () => onItemSelected(1),
       ),
       _NavBarItem(
-        icon: Icons.location_on,
+        icon: Icons.location_on_rounded,
         isSelected: selectedIndex == 2,
         isSidebar: isSidebar,
         onTap: () => onItemSelected(2),
       ),
       _NavBarItem(
-        icon: Icons.bar_chart,
+        icon: Icons.bar_chart_rounded,
         isSelected: selectedIndex == 3,
         isSidebar: isSidebar,
         onTap: () => onItemSelected(3),
       ),
       _NavBarItem(
-        icon: Icons.schedule,
+        icon: Icons.access_time_filled_rounded,
         isSelected: selectedIndex == 4,
         isSidebar: isSidebar,
         onTap: () => onItemSelected(4),
       ),
       _NavBarItem(
-        icon: Icons.local_fire_department,
+        icon: Icons.local_fire_department_rounded,
         isSelected: selectedIndex == 5,
         isSidebar: isSidebar,
         onTap: () => onItemSelected(5),
         badgeCount: fireAlertBadgeCount,
       ),
       _NavBarItem(
-        icon: Icons.settings,
+        icon: Icons.settings_rounded,
         isSelected: selectedIndex == 6,
         isSidebar: isSidebar,
         onTap: () => onItemSelected(6),
@@ -132,32 +150,33 @@ class _NavBarItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Container(
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
         margin: EdgeInsets.symmetric(vertical: isSidebar ? 6 : 0),
         padding: EdgeInsets.symmetric(
-          horizontal: isSidebar
-              ? AppSizes.paddingMedium
-              : AppSizes.paddingSmall,
-          vertical: AppSizes.paddingSmall,
+          horizontal: isSidebar ? 16 : 12,
+          vertical: 10,
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.12)
+              ? AppColors.primary.withValues(alpha: 0.1)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
             Icon(
               icon,
-              color: isSelected ? AppColors.primary : AppColors.textLight,
-              size: AppSizes.iconLarge,
+              color: isSelected ? AppColors.primary : AppColors.textSecondary.withValues(alpha: 0.7),
+              size: 26,
             ),
             if (badgeCount > 0)
               Positioned(
-                top: -8,
-                right: -8,
+                top: -6,
+                right: -6,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 5,
@@ -165,14 +184,15 @@ class _NavBarItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.error,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.surfaceLight, width: 1.5),
                   ),
                   child: Text(
                     badgeCount > 99 ? '99+' : badgeCount.toString(),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),

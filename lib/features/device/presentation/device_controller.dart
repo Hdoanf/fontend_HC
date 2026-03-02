@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/device_repository.dart';
 import '../domain/device_state.dart';
 
+import 'package:thuctap/app/providers.dart';
+
 final deviceRepositoryProvider = Provider<DeviceRepository>(
-  (ref) => const DeviceRepository(),
+  (ref) => DeviceRepository(ref.read(apiClientProvider)),
 );
 
 final deviceControllerProvider =

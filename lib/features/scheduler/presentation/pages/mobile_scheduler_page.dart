@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_sizes.dart';
 
 // Data class for a scheduled action
 class ScheduledAction {
@@ -8,6 +9,7 @@ class ScheduledAction {
   TimeOfDay time;
   List<String> daysOfWeek; // e.g., ['Mon', 'Wed', 'Fri']
   final String iconType; // e.g., 'light', 'tv', 'ac'
+  bool isEnabled;
 
   ScheduledAction({
     required this.deviceName,
@@ -15,6 +17,7 @@ class ScheduledAction {
     required this.time,
     required this.daysOfWeek,
     required this.iconType,
+    this.isEnabled = true,
   });
 }
 
@@ -27,7 +30,7 @@ class MobileSchedulerPage extends StatefulWidget {
 
 class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
   // Generates mock scheduled actions
-  List<ScheduledAction> _scheduledActions = [
+  final List<ScheduledAction> _scheduledActions = [
     ScheduledAction(
       deviceName: 'Smart Light',
       action: 'Turn On',
@@ -63,34 +66,51 @@ class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
         title: const Text(
           'Scheduler',
           style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
           ),
         ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.white, Colors.white],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: AppSizes.paddingMedium, top: 8, bottom: 8),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.textPrimary.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
+              onPressed: () => Navigator.of(context).maybePop(),
             ),
           ),
         ),
       ),
       body: _buildScheduledActionList(_scheduledActions),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // TODO: Implement adding a new scheduled action
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Add New Schedule (Not Implemented)')),
+            const SnackBar(content: Text('Feature coming soon!')),
           );
         },
         backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: AppColors.desktopTextPrimary),
+        elevation: 8,
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        label: const Text('Add Schedule', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -98,111 +118,139 @@ class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
   // Builds a list of scheduled actions
   Widget _buildScheduledActionList(List<ScheduledAction> actions) {
     if (actions.isEmpty) {
-      return const Center(
-        child: Text(
-          'No scheduled actions found. Add a new one!',
-          style: TextStyle(color: AppColors.textSecondary),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.schedule_rounded, size: 64, color: AppColors.textLight.withValues(alpha: 0.5)),
+            const SizedBox(height: 16),
+            const Text(
+              'No scheduled actions found.',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+          ],
         ),
       );
     }
     return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       itemCount: actions.length,
       itemBuilder: (context, index) {
         final action = actions[index];
-        return Card(
-          color: AppColors.surfaceLight,
-          elevation: 2,
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          child: ListTile(
-            leading: Icon(
-              _getIconForType(action.iconType),
-              color: _getColorForType(action.iconType),
-            ),
-            title: Text(
-              '${action.deviceName} - ${action.action}',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceLight,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textPrimary.withValues(alpha: 0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
               ),
-            ),
-            subtitle: Text(
-              '${action.time.format(context)} | ${action.daysOfWeek.join(', ')}',
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
-            trailing: IconButton(
-              icon: const Icon(Icons.edit, color: AppColors.primary),
-              onPressed: () async {
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () async {
                 final updatedAction = await showDialog<ScheduledAction>(
                   context: context,
-                  builder: (context) =>
-                      _EditScheduleDialog(initialAction: action),
+                  builder: (context) => _EditScheduleDialog(initialAction: action),
                 );
-
                 if (updatedAction != null) {
                   setState(() {
                     _scheduledActions[index] = updatedAction;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Schedule for ${updatedAction.deviceName} updated!',
-                      ),
-                    ),
-                  );
                 }
               },
+              borderRadius: BorderRadius.circular(24),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: _getColorForType(action.iconType).withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _getIconForType(action.iconType),
+                        color: _getColorForType(action.iconType),
+                        size: 26,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${action.deviceName} • ${action.action}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${action.time.format(context)} | ${action.daysOfWeek.join(', ')}',
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: action.isEnabled,
+                      onChanged: (val) {
+                        setState(() {
+                          action.isEnabled = val;
+                        });
+                      },
+                      activeColor: AppColors.success,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            onTap: () {
-              // TODO: View details or toggle enable/disable
-            },
           ),
         );
       },
     );
   }
 
-  // Returns a color for a given device type (from AppColors)
   Color _getColorForType(String type) {
     switch (type) {
-      case 'light':
-        return AppColors.chartOrange;
-      case 'tv':
-        return AppColors.chartPurple;
-      case 'appliance':
-        return AppColors.chartGreen;
-      case 'ac':
-        return AppColors.chartRed;
-      case 'electronics':
-        return AppColors.chartBlue;
-      default:
-        return AppColors.disabled;
+      case 'light': return const Color(0xFFFFB236);
+      case 'tv': return const Color(0xFF9D63F4);
+      case 'appliance': return const Color(0xFF22C55E);
+      case 'ac': return const Color(0xFFFF5252);
+      default: return AppColors.primary;
     }
   }
 
-  // Gets an icon for a given device type
   IconData _getIconForType(String type) {
     switch (type) {
-      case 'light':
-        return Icons.lightbulb_outline;
-      case 'tv':
-        return Icons.tv_outlined;
-      case 'appliance':
-        return Icons.kitchen_outlined;
-      case 'ac':
-        return Icons.ac_unit_outlined;
-      case 'electronics':
-        return Icons.power_outlined;
-      default:
-        return Icons.device_unknown_outlined;
+      case 'light': return Icons.lightbulb_rounded;
+      case 'tv': return Icons.tv_rounded;
+      case 'appliance': return Icons.kitchen_rounded;
+      case 'ac': return Icons.ac_unit_rounded;
+      default: return Icons.device_hub_rounded;
     }
   }
 }
 
-// Dialog for editing a scheduled action
 class _EditScheduleDialog extends StatefulWidget {
   final ScheduledAction initialAction;
-
   const _EditScheduleDialog({required this.initialAction});
 
   @override
@@ -212,124 +260,87 @@ class _EditScheduleDialog extends StatefulWidget {
 class _EditScheduleDialogState extends State<_EditScheduleDialog> {
   late TimeOfDay _selectedTime;
   late String _selectedAction;
-  late List<String> _selectedDays;
 
   @override
   void initState() {
     super.initState();
     _selectedTime = widget.initialAction.time;
     _selectedAction = widget.initialAction.action;
-    _selectedDays = List.from(widget.initialAction.daysOfWeek);
-  }
-
-  Future<void> _pickTime() async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime,
-      builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: AppColors.surfaceLight,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       title: Text(
-        'Edit ${widget.initialAction.deviceName} Schedule',
-        style: const TextStyle(color: AppColors.textPrimary),
+        'Edit Schedule',
+        style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5, color: AppColors.textPrimary),
       ),
-      backgroundColor: AppColors.background,
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.access_time, color: AppColors.primary),
-              title: const Text(
-                'Time',
-                style: TextStyle(color: AppColors.textPrimary),
-              ),
-              trailing: TextButton(
-                onPressed: _pickTime,
-                child: Text(
-                  _selectedTime.format(context),
-                  style: const TextStyle(color: AppColors.primary),
-                ),
-              ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(16),
             ),
-            ListTile(
-              leading: const Icon(
-                Icons.power_settings_new,
-                color: AppColors.primary,
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Time', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+              trailing: Text(
+                _selectedTime.format(context),
+                style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16),
               ),
-              title: const Text(
-                'Action',
-                style: TextStyle(color: AppColors.textPrimary),
-              ),
-              trailing: DropdownButton<String>(
+              onTap: () async {
+                final picked = await showTimePicker(context: context, initialTime: _selectedTime);
+                if (picked != null) setState(() => _selectedTime = picked);
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
                 value: _selectedAction,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedAction = newValue!;
-                  });
-                },
-                items: <String>['Turn On', 'Turn Off']
-                    .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: const TextStyle(color: AppColors.textPrimary),
-                        ),
-                      );
-                    })
-                    .toList(),
+                isExpanded: true,
+                onChanged: (val) => setState(() => _selectedAction = val!),
+                items: ['Turn On', 'Turn Off'].map((val) => DropdownMenuItem(
+                  value: val,
+                  child: Text(val, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                )).toList(),
               ),
             ),
-            // TODO: Implement editing days of week
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                'Days of Week (Not editable yet)',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.of(context).pop(); // Dismiss dialog
-          },
-          child: const Text(
-            'Cancel',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
         ),
-        TextButton(
+        ElevatedButton(
           onPressed: () {
-            final updatedAction = ScheduledAction(
+            Navigator.of(context).pop(ScheduledAction(
               deviceName: widget.initialAction.deviceName,
               action: _selectedAction,
               time: _selectedTime,
-              daysOfWeek: _selectedDays,
+              daysOfWeek: widget.initialAction.daysOfWeek,
               iconType: widget.initialAction.iconType,
-            );
-            Navigator.of(
-              context,
-            ).pop(updatedAction); // Pass updated action back
+              isEnabled: widget.initialAction.isEnabled,
+            ));
           },
-          child: const Text('Save', style: TextStyle(color: AppColors.primary)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ],
     );

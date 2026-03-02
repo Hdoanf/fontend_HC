@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:thuctap/core/constants/app_colors.dart';
+import 'package:thuctap/core/constants/app_sizes.dart';
+import 'package:thuctap/core/constants/app_strings.dart';
+import 'package:thuctap/features/auth/presentation/login_controller.dart';
 import 'package:thuctap/features/fire_alert/fire_alert_routes.dart';
 import 'package:thuctap/features/fire_alert/presentation/fire_alert_controller.dart';
 
@@ -9,67 +13,102 @@ class DesktopHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final session = ref.watch(authControllerProvider).valueOrNull;
+    final displayName = (session?.name ?? '').trim();
+    final greeting = displayName.isEmpty ? 'Hi, User' : 'Hi, $displayName';
     final unreadCount = ref.watch(
       fireAlertControllerProvider.select((state) => state.unreadCount),
     );
 
     return Row(
       children: [
-        const CircleAvatar(
-          radius: 22,
-          backgroundImage: NetworkImage(
-            'https://scontent.fhan19-1.fna.fbcdn.net/v/t39.30808-6/480687439_997331652508361_7218280523185220920_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeHMlg0OzlB3v-_6hDYcMD1EjP0bODaIebmM_Rs4Noh5uToEf218ndixjOCvYE883Al_tzYdV9XlSw8EBjNKdvhw&_nc_ohc=4KNq08NCV2EQ7kNvwEnf5z8&_nc_oc=AdlZm3-XbWS9wUTMn6yG-PPtXJEDHTWSicQ-ame6EL57lAq48OuTF3iKpxeAs1_cT6s&_nc_zt=23&_nc_ht=scontent.fhan19-1.fna&_nc_gid=oD2HaRilSSwSImxXAL9RLQ&oh=00_AfoCmenKOfxUe5915P18MWyJxBYQz8e_nH0wyLW6BdQrYw&oe=697F507D',
+        Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 2),
+          ),
+          child: CircleAvatar(
+            radius: AppSizes.profileAvatarSize / 1.5,
+            backgroundColor: AppColors.surfaceGray,
+            backgroundImage: const NetworkImage(
+              'https://th.bing.com/th/id/OIP.OmJICjo6Xt-Ay8oWfxkGNQHaHa?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3',
+            ),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppSizes.paddingLarge),
 
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Hi, User!',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              greeting,
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+                letterSpacing: -1,
+              ),
             ),
-            SizedBox(height: 4),
-            Text(
-              'Welcome back to your smart Home.',
-              style: TextStyle(color: Colors.grey),
+            const SizedBox(height: 4),
+            const Text(
+              AppStrings.welcomeBack,
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
 
         const Spacer(),
 
-        IconButton(
-          onPressed: () => context.go(FireAlertRoutes.alerts),
-          icon: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(Icons.notifications_none),
-              if (unreadCount > 0)
-                Positioned(
-                  top: -6,
-                  right: -8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFDC2626),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      unreadCount > 99 ? '99+' : unreadCount.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceLight,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textPrimary.withValues(alpha: 0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: IconButton(
+            padding: const EdgeInsets.all(12),
+            onPressed: () => context.go(FireAlertRoutes.alerts),
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(Icons.notifications_rounded, color: AppColors.textPrimary, size: 28),
+                if (unreadCount > 0)
+                  Positioned(
+                    top: -4,
+                    right: -4,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.error,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: Text(
+                        unreadCount > 99 ? '99+' : unreadCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

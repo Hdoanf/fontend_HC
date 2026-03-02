@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:thuctap/core/widgets/webcam_mjpeg_view.dart';
+import 'package:thuctap/core/constants/app_colors.dart';
 
 class CameraItem {
   final String name;
@@ -148,8 +149,8 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
                 ),
                 child: Icon(
                   _videoController!.value.isPlaying
-                      ? Icons.pause
-                      : Icons.play_arrow,
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded,
                   color: Colors.white,
                   size: 40,
                 ),
@@ -168,23 +169,35 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Add New Camera'),
+        backgroundColor: AppColors.surfaceLight,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        title: const Text('Add New Camera', style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Camera Name',
-                border: OutlineInputBorder(),
+            Container(
+              decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(16)),
+              child: TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Camera Name',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  filled: true,
+                  fillColor: Colors.transparent,
+                ),
               ),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: urlController,
-              decoration: const InputDecoration(
-                labelText: 'Video URL',
-                border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            Container(
+              decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(16)),
+              child: TextField(
+                controller: urlController,
+                decoration: InputDecoration(
+                  labelText: 'Video URL',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  filled: true,
+                  fillColor: Colors.transparent,
+                ),
               ),
             ),
           ],
@@ -192,9 +205,13 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
             onPressed: () async {
               final name = nameController.text.trim();
               final url = urlController.text.trim();
@@ -209,9 +226,11 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
 
               await _switchCamera(newIndex);
 
-              Navigator.pop(dialogContext);
+              if (context.mounted) {
+                Navigator.pop(dialogContext);
+              }
             },
-            child: const Text('Add'),
+            child: const Text('Add', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -221,34 +240,53 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: AppColors.background,
       appBar: _isFullscreen
           ? null
           : AppBar(
-              title: Text(cameras[_currentCameraIndex].name),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              title: Text(
+                cameras[_currentCameraIndex].name,
+                style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5),
+              ),
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: _showAddCameraDialog,
+                Container(
+                  margin: const EdgeInsets.only(right: 24),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [BoxShadow(color: AppColors.textPrimary.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4))],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.add_rounded, color: AppColors.textPrimary),
+                    onPressed: _showAddCameraDialog,
+                  ),
                 ),
               ],
             ),
 
       body: Padding(
-        padding: EdgeInsets.zero,
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
             /// VIDEO – 1 INSTANCE DUY NHẤT
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               width: double.infinity,
-              height: _isFullscreen ? MediaQuery.of(context).size.height : 260,
+              height: _isFullscreen ? MediaQuery.of(context).size.height : 500,
+              decoration: BoxDecoration(
+                boxShadow: _isFullscreen ? [] : [
+                  BoxShadow(color: AppColors.textPrimary.withValues(alpha: 0.1), blurRadius: 30, offset: const Offset(0, 15))
+                ],
+              ),
               child: _buildVideo(),
             ),
 
             /// CAMERA LIST (ẨN KHI FULLSCREEN)
             if (!_isFullscreen) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               _buildCameraList(),
             ],
           ],
@@ -269,20 +307,25 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
 
           return GestureDetector(
             onTap: () => _switchCamera(index),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
-                color: isActive ? Colors.blue.withOpacity(0.15) : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isActive ? Colors.blue : Colors.grey.shade300,
-                ),
+                color: isActive ? AppColors.primary : AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: isActive ? [
+                  BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))
+                ] : [
+                  BoxShadow(color: AppColors.textPrimary.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))
+                ],
               ),
-              child: Text(
-                cameras[index].name,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: isActive ? Colors.blue : Colors.black,
+              child: Center(
+                child: Text(
+                  cameras[index].name,
+                  style: TextStyle(
+                    fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                    color: isActive ? Colors.white : AppColors.textSecondary,
+                  ),
                 ),
               ),
             ),
@@ -295,7 +338,7 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
   Widget _buildVideo() {
     return Material(
       color: Colors.black,
-      borderRadius: BorderRadius.circular(_isFullscreen ? 0 : 16),
+      borderRadius: BorderRadius.circular(_isFullscreen ? 0 : 28),
       clipBehavior: Clip.antiAlias,
       child: _isMjpegStream
           ? Stack(
@@ -309,12 +352,13 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
                   ),
                 ),
                 Positioned(
-                  top: 12,
-                  right: 12,
+                  top: 16,
+                  right: 16,
                   child: IconButton(
                     icon: Icon(
-                      _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                      _isFullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded,
                       color: Colors.white,
+                      size: 32,
                     ),
                     onPressed: () {
                       setState(() {
@@ -343,12 +387,13 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
                 ),
                 _playPauseButton(),
                 Positioned(
-                  top: 12,
-                  right: 12,
+                  top: 16,
+                  right: 16,
                   child: IconButton(
                     icon: Icon(
-                      _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                      _isFullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded,
                       color: Colors.white,
+                      size: 32,
                     ),
                     onPressed: () {
                       setState(() {
@@ -359,7 +404,7 @@ class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
                 ),
               ],
             )
-          : const Center(child: CircularProgressIndicator(color: Colors.white)),
+          : const Center(child: CircularProgressIndicator(color: AppColors.primary)),
     );
   }
 

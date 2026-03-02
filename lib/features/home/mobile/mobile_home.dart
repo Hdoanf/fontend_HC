@@ -5,7 +5,6 @@ import 'package:thuctap/features/home/mobile/frequently_used_section.dart';
 import 'package:thuctap/features/home/mobile/header_widget.dart';
 import 'package:thuctap/features/home/mobile/menu_page.dart';
 import 'package:thuctap/features/home/mobile/rooms_section.dart';
-import '';
 
 class MobileHomePage extends StatefulWidget {
   const MobileHomePage({Key? key}) : super(key: key);
@@ -20,10 +19,11 @@ class _MobileHomePageState extends State<MobileHomePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: Padding(
-          padding: const EdgeInsets.all(AppSizes.paddingMedium),
+          padding: const EdgeInsets.only(left: AppSizes.paddingMedium, top: 8, bottom: 8),
           child: GestureDetector(
             onTap: () {
               Navigator.push(
@@ -33,39 +33,57 @@ class _MobileHomePageState extends State<MobileHomePage> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.surfaceGray,
+                color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textPrimary.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              child: Icon(Icons.menu, color: AppColors.textPrimary),
+              child: const Icon(Icons.grid_view_rounded, color: AppColors.textPrimary, size: 20),
             ),
           ),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.all(AppSizes.paddingMedium),
+            padding: const EdgeInsets.only(right: AppSizes.paddingMedium, top: 8, bottom: 8),
             child: Container(
+              width: 40,
               decoration: BoxDecoration(
-                color: AppColors.surfaceGray,
+                color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textPrimary.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              child: Icon(
-                Icons.notifications_none,
+              child: const Icon(
+                Icons.notifications_outlined,
                 color: AppColors.textPrimary,
+                size: 22,
               ),
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const HeaderWidget(),
-            const SizedBox(height: AppSizes.paddingLarge),
-            const RoomsSection(),
-            const SizedBox(height: AppSizes.paddingLarge),
-            const FrequentlyUsedSection(),
-            const SizedBox(height: AppSizes.paddingXLarge),
+            SizedBox(height: AppSizes.paddingSmall),
+            HeaderWidget(),
+            SizedBox(height: AppSizes.paddingLarge),
+            RoomsSection(),
+            SizedBox(height: AppSizes.paddingLarge),
+            FrequentlyUsedSection(),
+            SizedBox(height: AppSizes.paddingXLarge * 2),
           ],
         ),
       ),
