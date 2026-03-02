@@ -55,7 +55,7 @@ lib/
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Hdoanf/fontend_HC.git
    cd fontend
    ```
 
@@ -84,3 +84,4 @@ The project follows a clean, modern design system using:
 ## 📝 License
 
 This project is for internal/educational use. See `pubspec.yaml` for more details.
+
