@@ -20,4 +20,8 @@ class AuthRepository {
   }) {
     return _authApi.signUp(name: name, email: email, password: password);
   }
+
+  Future<void> signOut() {
+    return _authApi.signOut();
+  }
 }

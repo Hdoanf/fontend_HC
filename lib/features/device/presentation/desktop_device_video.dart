@@ -10,7 +10,7 @@ class DesktopDeviceVideo extends StatefulWidget {
 }
 
 class _DesktopDeviceVideoState extends State<DesktopDeviceVideo> {
-  static const String _localWebcamUrl = 'http://192.168.1.33:8080/video';
+  static const String _localWebcamUrl = 'http://192.168.1.55:8080/video';
 
   VideoPlayerController? _controller;
   bool _isFullScreen = false;
@@ -61,6 +61,9 @@ class _DesktopDeviceVideoState extends State<DesktopDeviceVideo> {
           color: Colors.black,
           child: _isMjpegStream
               ? InteractiveViewer(
+                  clipBehavior: Clip.none,
+                  minScale: 1.0,
+                  maxScale: 4.0,
                   child: WebcamMjpegView(
                     streamUrl: _localWebcamUrl,
                     fit: BoxFit.cover,
@@ -70,33 +73,88 @@ class _DesktopDeviceVideoState extends State<DesktopDeviceVideo> {
               ? Stack(
                   alignment: Alignment.center,
                   children: [
-                    FittedBox(
-                      fit: BoxFit.cover,
-                      child: SizedBox(
-                        width: _controller!.value.size.width,
-                        height: _controller!.value.size.height,
-                        child: VideoPlayer(_controller!),
+                    InteractiveViewer(
+                      clipBehavior: Clip.none,
+                      minScale: 1.0,
+                      maxScale: 4.0,
+                      child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: SizedBox(
+                          width: _controller!.value.size.width,
+                          height: _controller!.value.size.height,
+                          child: VideoPlayer(_controller!),
+                        ),
                       ),
                     ),
 
-                    /// PLAY BUTTON
-                    Center(
-                      child: IconButton(
-                        iconSize: 64,
-                        icon: Icon(
-                          _controller!.value.isPlaying
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_fill,
-                          color: Colors.white70,
+                    /// CONTROLS OVERLAY
+                    Positioned.fill(
+                      child: GestureDetector(
+                        onTap: _togglePlay,
+                        child: Container(
+                          color: Colors.transparent,
                         ),
-                        onPressed: _togglePlay,
+                      ),
+                    ),
+
+                    /// PLAY/PAUSE & REWIND/FORWARD
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          iconSize: 48,
+                          icon: const Icon(Icons.replay_10_rounded, color: Colors.white70),
+                          onPressed: () {
+                            final newPosition = _controller!.value.position - const Duration(seconds: 10);
+                            _controller!.seekTo(newPosition < Duration.zero ? Duration.zero : newPosition);
+                          },
+                        ),
+                        IconButton(
+                          iconSize: 64,
+                          icon: Icon(
+                            _controller!.value.isPlaying
+                                ? Icons.pause_circle_filled
+                                : Icons.play_circle_fill,
+                            color: Colors.white70,
+                          ),
+                          onPressed: _togglePlay,
+                        ),
+                        IconButton(
+                          iconSize: 48,
+                          icon: const Icon(Icons.forward_10_rounded, color: Colors.white70),
+                          onPressed: () {
+                            final newPosition = _controller!.value.position + const Duration(seconds: 10);
+                            _controller!.seekTo(newPosition);
+                          },
+                        ),
+                      ],
+                    ),
+
+                    /// PROGRESS SLIDER
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          VideoProgressIndicator(
+                            _controller!,
+                            allowScrubbing: true,
+                            colors: const VideoProgressColors(
+                              playedColor: Colors.red,
+                              bufferedColor: Colors.white24,
+                              backgroundColor: Colors.white10,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 
                     /// TITLE
                     Positioned(
                       left: 16,
-                      bottom: 16,
+                      bottom: 20,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,

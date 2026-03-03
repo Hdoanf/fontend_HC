@@ -11,8 +11,7 @@ class HeaderWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(authControllerProvider).valueOrNull;
-    final displayName = (session?.name ?? '').trim();
-    final greeting = displayName.isEmpty ? 'Hi, User' : 'Hi, $displayName';
+    final userName = session?.name ?? 'User Name';
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -40,7 +39,7 @@ class HeaderWidget extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  greeting,
+                  'Hi, $userName',
                   style: const TextStyle(
                     fontSize: AppSizes.fontTitle,
                     fontWeight: FontWeight.w800,

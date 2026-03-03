@@ -1,14 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../settings/presentation/pages/mobile_settings_page.dart';
+import '../../auth/presentation/login_controller.dart';
 
-class MenuPage extends StatelessWidget {
+class MenuPage extends ConsumerWidget {
   const MenuPage({super.key});
 
+  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(29)),
+        title: const Text("Logout", style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text("Are you sure you want to sign out?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true), 
+            child: const Text("Logout", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await ref.read(authControllerProvider.notifier).signOut();
+      if (context.mounted) {
+        // Nếu dùng Navigator.push để mở MenuPage, hãy pop nó trước khi go
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+        context.go('/sign-in');
+      }
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final session = ref.watch(authControllerProvider).valueOrNull;
+    final userName = session?.name ?? 'User Name';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -52,12 +86,12 @@ class MenuPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProfileSection(context),
+            _buildProfileSection(context, userName),
             const SizedBox(height: 32),
             _buildMenuSection(
               'Home Management',
               [
-                _MenuItem(icon: Icons.home_rounded, title: 'My Home', color: Colors.blue, onTap: () => context.go('/')),
+                _MenuItem(icon: Icons.home_rounded, title: 'My Home', color: Colors.blue, onTap: () => context.push('/my-homes')),
                 _MenuItem(icon: Icons.grid_view_rounded, title: 'All Devices', color: Colors.orange, onTap: () => context.go('/devices')),
                 _MenuItem(icon: Icons.location_on_rounded, title: 'Room Map', color: Colors.green, onTap: () => context.go('/rooms')),
               ],
@@ -84,7 +118,12 @@ class MenuPage extends StatelessWidget {
                   },
                 ),
                 _MenuItem(icon: Icons.help_outline_rounded, title: 'Support', color: Colors.indigo, onTap: () {}),
-                _MenuItem(icon: Icons.logout_rounded, title: 'Logout', color: Colors.red, onTap: () => context.go('/sign-in')),
+                _MenuItem(
+                  icon: Icons.logout_rounded, 
+                  title: 'Logout', 
+                  color: Colors.red, 
+                  onTap: () => _handleLogout(context, ref),
+                ),
               ],
             ),
             const SizedBox(height: 100),
@@ -94,7 +133,7 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileSection(BuildContext context) {
+  Widget _buildProfileSection(BuildContext context, String name) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -119,7 +158,7 @@ class MenuPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('User Name', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.textPrimary, letterSpacing: -0.5)),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.textPrimary, letterSpacing: -0.5)),
                 const SizedBox(height: 2),
                 Text('Standard Account', style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
               ],

@@ -21,7 +21,7 @@ class DesktopDevicesPage extends StatefulWidget {
 Key _videoKey = UniqueKey();
 
 class _DesktopDevicesPageState extends State<DesktopDevicesPage> {
-  static const String _localWebcamUrl = 'http://192.168.1.33:8080/video';
+  static const String _localWebcamUrl = 'http://192.168.1.55:8080/video';
 
   VideoPlayerController? _videoController;
   bool _isMjpegStream = false;

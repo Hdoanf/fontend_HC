@@ -45,3 +45,5 @@ ios/Flutter/.last_build_id
 # ===== Environment =====
 .env
 .env.*
+# Memory
+memory.md

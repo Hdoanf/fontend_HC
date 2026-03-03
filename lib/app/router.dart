@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:thuctap/features/scheduler/presentation/pages/device_scheduler_page.dart';
 import 'package:thuctap/features/scheduler/presentation/pages/mobile_scheduler_page.dart';
@@ -18,6 +19,7 @@ import 'package:thuctap/features/fire_alert/presentation/fire_alert_screen.dart'
 import '../features/auth/presentation/pages/sign_up_page.dart';
 import '../features/home/home_page.dart';
 import '../features/home/mobile/mobile_shell_page.dart';
+import '../features/home/presentation/pages/my_homes_page.dart';
 import '../core/utils/responsive_layout.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -44,6 +46,7 @@ final GoRouter appRouter = GoRouter(
       },
       routes: [
         GoRoute(path: '/', builder: (context, state) => const HomePage()),
+        GoRoute(path: '/my-homes', builder: (context, state) => const MyHomesPage()),
         GoRoute(
           path: DeviceRoutes.devices,
           builder: (context, state) => const DeviceScreen(),
@@ -51,11 +54,11 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/rooms',
           builder: (context, state) {
-            final roomName = state.uri.queryParameters['roomName'];
+            final roomData = state.extra as Map<String, dynamic>?;
             return ResponsiveLayout(
-              mobile: MobileLocationPage(initialRoom: roomName),
-              tablet: DesktopLocationPage(initialRoomName: roomName),
-              web: DesktopLocationPage(initialRoomName: roomName),
+              mobile: MobileLocationPage(initialRoomData: roomData),
+              tablet: MobileLocationPage(initialRoomData: roomData),
+              web: MobileLocationPage(initialRoomData: roomData),
             );
           },
         ),

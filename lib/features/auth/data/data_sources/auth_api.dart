@@ -34,33 +34,32 @@ class AuthApi {
     }
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _tryReadMessage(response.body) ??
+      final message =
+          _tryReadMessage(response.body) ??
           'Đăng nhập thất bại (HTTP ${response.statusCode}): ${_compactBody(response.body)}';
       throw AuthException(message);
     }
 
-    final payload = _decodePayload(response.body);
-    final accessToken = _readString(payload, const [
-      'accessToken',
-      'token',
-      'access_token',
-    ]);
-    final refreshToken = _readString(payload, const [
-      'refreshToken',
-      'refresh_token',
-    ]);
-    final userId = _readStringOrInt(payload, const ['userId', 'user_id', 'id']);
-    final name = _readString(payload, const ['name', 'fullName', 'full_name']);
-    final resolvedEmail =
-        _readString(payload, const ['email']) ?? email;
+    final payload = jsonDecode(response.body) as Map<String, dynamic>;
+    final token = payload['token'] as String?;
+    final name = payload['name'] as String?;
 
     return AuthSession(
-      accessToken: accessToken ?? '',
-      refreshToken: refreshToken ?? '',
-      userId: userId ?? '',
-      name: name ?? '',
-      email: resolvedEmail,
+      accessToken: token ?? '',
+      refreshToken: '',
+      userId: '',
+      name: name ?? email.split('@').first,
+      email: email,
     );
+  }
+
+  Future<void> signOut() async {
+    try {
+      final uri = Uri.parse(_joinUrl(_apiClient.baseUrl, '/auth/logout'));
+      await _postJsonWithRedirect(uri: uri, body: {});
+    } catch (e) {
+      print("Logout API error (ignoring): $e");
+    }
   }
 
   Future<void> signUp({
@@ -84,6 +83,7 @@ class AuthApi {
       response = await _postJsonWithRedirect(
         uri: uri,
         body: {
+          'name': name.trim(),
           'email': email.trim(),
           'password': password,
         },
@@ -93,7 +93,8 @@ class AuthApi {
     }
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _tryReadMessage(response.body) ??
+      final message =
+          _tryReadMessage(response.body) ??
           'Đăng ký thất bại (HTTP ${response.statusCode}): ${_compactBody(response.body)}';
       throw AuthException(message);
     }
@@ -111,7 +112,9 @@ class AuthException implements Exception {
 
 String _joinUrl(String baseUrl, String path) {
   if (baseUrl.endsWith('/')) {
-    return path.startsWith('/') ? '$baseUrl${path.substring(1)}' : '$baseUrl$path';
+    return path.startsWith('/')
+        ? '$baseUrl${path.substring(1)}'
+        : '$baseUrl$path';
   }
   return path.startsWith('/') ? '$baseUrl$path' : '$baseUrl/$path';
 }
@@ -198,10 +201,7 @@ Future<http.Response> _postJsonWithRedirect({
   for (var attempt = 0; attempt < 3; attempt++) {
     response = await http.post(
       target,
-      headers: const {
-        'Accept': '*/*',
-        'Content-Type': 'application/json',
-      },
+      headers: const {'Accept': '*/*', 'Content-Type': 'application/json'},
       body: jsonEncode(body),
     );
 

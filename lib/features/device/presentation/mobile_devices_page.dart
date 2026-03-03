@@ -12,7 +12,7 @@ class MobileDevicesPage extends StatefulWidget {
 }
 
 class _MobileDevicesPageState extends State<MobileDevicesPage> {
-  static const String _localWebcamUrl = 'http://192.168.1.33:8080/video';
+  static const String _localWebcamUrl = 'http://192.168.1.55:8080/video';
 
   final List<Map<String, String>> cameras = [
     {'name': 'Living Room Cam', 'videoUrl': _localWebcamUrl},
@@ -338,6 +338,9 @@ class _VideoDialogState extends State<VideoDialog> {
         color: Colors.black,
         child: _isMjpegStream
             ? InteractiveViewer(
+                clipBehavior: Clip.none,
+                minScale: 1.0,
+                maxScale: 4.0,
                 child: WebcamMjpegView(
                   streamUrl: widget.videoUrl,
                   fit: BoxFit.cover,
@@ -347,32 +350,91 @@ class _VideoDialogState extends State<VideoDialog> {
             ? Stack(
                 fit: StackFit.expand,
                 children: [
-                  FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: _videoController!.value.size.width,
-                      height: _videoController!.value.size.height,
-                      child: VideoPlayer(_videoController!),
+                  InteractiveViewer(
+                    clipBehavior: Clip.none,
+                    minScale: 1.0,
+                    maxScale: 4.0,
+                    child: FittedBox(
+                      fit: BoxFit.cover,
+                      child: SizedBox(
+                        width: _videoController!.value.size.width,
+                        height: _videoController!.value.size.height,
+                        child: VideoPlayer(_videoController!),
+                      ),
                     ),
                   ),
-                  Center(
-                    child: IconButton(
-                      iconSize: 56,
-                      icon: Icon(
-                        _videoController!.value.isPlaying
-                            ? Icons.pause_circle_filled_rounded
-                            : Icons.play_circle_fill_rounded,
-                        color: Colors.white70,
-                      ),
-                      onPressed: () {
+
+                  /// CONTROLS OVERLAY
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () {
                         setState(() {
                           _videoController!.value.isPlaying
                               ? _videoController!.pause()
                               : _videoController!.play();
                         });
                       },
+                      child: Container(color: Colors.transparent),
                     ),
                   ),
+
+                  /// CENTER CONTROLS
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          iconSize: 40,
+                          icon: const Icon(Icons.replay_10_rounded, color: Colors.white70),
+                          onPressed: () {
+                            final newPos = _videoController!.value.position - const Duration(seconds: 10);
+                            _videoController!.seekTo(newPos < Duration.zero ? Duration.zero : newPos);
+                          },
+                        ),
+                        IconButton(
+                          iconSize: 56,
+                          icon: Icon(
+                            _videoController!.value.isPlaying
+                                ? Icons.pause_circle_filled_rounded
+                                : Icons.play_circle_fill_rounded,
+                            color: Colors.white70,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _videoController!.value.isPlaying
+                                  ? _videoController!.pause()
+                                  : _videoController!.play();
+                            });
+                          },
+                        ),
+                        IconButton(
+                          iconSize: 40,
+                          icon: const Icon(Icons.forward_10_rounded, color: Colors.white70),
+                          onPressed: () {
+                            final newPos = _videoController!.value.position + const Duration(seconds: 10);
+                            _videoController!.seekTo(newPos);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// PROGRESS BAR
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: VideoProgressIndicator(
+                      _videoController!,
+                      allowScrubbing: true,
+                      colors: const VideoProgressColors(
+                        playedColor: AppColors.primary,
+                        bufferedColor: Colors.white24,
+                        backgroundColor: Colors.transparent,
+                      ),
+                    ),
+                  ),
+
                   Positioned(
                     top: _isFullScreen ? 40 : 8,
                     right: 8,

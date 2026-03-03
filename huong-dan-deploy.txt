@@ -1,0 +1,88 @@
+=============================================================
+HƯỚNG DẪN DEPLOY .NET + SQL SERVER + FRONTEND RA INTERNET
+=============================================================
+
+## 1. CÁC LỰA CHỌN HOSTING MIỄN PHÍ (KHÔNG CẦN THẺ)
+
+### a) MonsterASP.NET (Khuyến nghị)
+- Storage: 1GB
+- Database: 1 MS SQL Server
+- .NET Core 8/9
+- Đầy đủ tính năng
+- Link: https://www.monsterasp.net
+
+### b) SomEE.com
+- Storage: 150MB
+- Bandwidth: 5GB/tháng
+- SQL: 30MB
+- .NET 4.8 + .NET Core 9
+- Có quảng cáo
+- Link: https://somee.com
+
+### c) aspnetcore.net
+- Storage: 5GB
+- SQL Server 2022
+- .NET Core miễn phí
+- Link: https://aspnetcore.net
+
+### d) FreeASPHosting.net
+- Storage: 5GB
+- SQL Server
+- .NET 9
+- Link: https://freeasphosting.net
+
+
+## 2. CÁC LỰA CHỌN FREE TỐT HƠN (CẦN THẺ/TÀI KHOẢN)
+
+### a) Oracle Cloud Free Tier (Khuyến nghị cao nhất)
+- VPS miễn phí vĩnh viễn
+- Database miễn phí
+- KHÔNG cần thẻ tín dụng
+- Tự cài đặt SQL Server
+- Link: https://oracle.com/cloud/free
+
+### b) Azure Free Account
+- $200 credits/30 ngày
+- App Service + Azure SQL
+- Cần thẻ để đăng ký
+- Link: https://azure.microsoft.com/free
+
+
+## 3. KHUYẾN NGHỊ THEO MỤC ĐÍCH
+
+### Demo nhỏ, test nhanh:
+→ Dùng MonsterASP.NET hoặc SomEE.com
+→ Không cần cấu hình gì phức tạp
+→ Upload code lên là chạy
+
+### Project thực tế, cần ổn định:
+→ Dùng Oracle Cloud Free Tier
+→ Full control, không giới hạn
+→ Cần cài đặt thủ công
+
+
+## 4. CÁC BƯỚC DEPLOY CƠ BẢN
+
+### Backend (.NET):
+1. Publish ứng dụng: dotnet publish -c Release
+2. Upload file lên hosting hoặc dùng Git
+3. Cấu hình connection string đến SQL Server
+
+### Database (SQL Server):
+1. Tạo database trên hosting
+2. Chạy migration hoặc script SQL
+3. Cập nhật connection string trong appsettings.json
+
+### Frontend:
+- Build: npm run build
+- Deploy lên: Netlify, Vercel, hoặc chung với backend
+
+
+## 5. LƯU Ý QUAN TRỌNG
+
+- Thay đổi connection string từ localhost sang server mới
+- Bật CORS nếu frontend và backend ở domain khác nhau
+- Sử dụng HTTPS (có sẵn trên hầu hết hosting)
+- Không đẩy connection string có password lên Git
+
+=============================================================

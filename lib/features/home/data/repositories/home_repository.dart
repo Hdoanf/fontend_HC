@@ -1,20 +1,10 @@
-import '../../../../core/services/api_client.dart';
-import '../models/home_models.dart';
+import '../data_sources/home_api.dart';
 
 class HomeRepository {
-  final ApiClient _apiClient;
+  final HomeApi _homeApi;
 
-  HomeRepository(this._apiClient);
+  HomeRepository(this._homeApi);
 
-  Future<List<HomeModel>> getHomes() async {
-    final List<dynamic> data = await _apiClient.get('/Home');
-    return data.map((json) => HomeModel.fromJson(json)).toList();
-  }
-
-  Future<void> createRoom(String roomName, int homeId) async {
-    await _apiClient.post('/Room', {
-      'roomName': roomName,
-      'homeId': homeId,
-    });
-  }
+  Future<Map<String, dynamic>> createHome(String name) => _homeApi.createHome(name);
+  Future<List<dynamic>> getHomes() => _homeApi.getHomes();
 }
