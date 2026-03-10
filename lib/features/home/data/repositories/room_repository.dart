@@ -15,4 +15,6 @@ class RoomRepository {
     roomName: roomName,
     description: description,
   );
+
+  Future<void> deleteRoom(int roomId) => _roomApi.deleteRoom(roomId);
 }

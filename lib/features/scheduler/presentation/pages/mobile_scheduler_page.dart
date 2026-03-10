@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
+import '../../../../core/widgets/top_notice.dart';
 
 // Data class for a scheduled action
 class ScheduledAction {
@@ -80,7 +81,11 @@ class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
           ),
         ),
         leading: Padding(
-          padding: const EdgeInsets.only(left: AppSizes.paddingMedium, top: 8, bottom: 8),
+          padding: const EdgeInsets.only(
+            left: AppSizes.paddingMedium,
+            top: 8,
+            bottom: 8,
+          ),
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.surfaceLight,
@@ -94,7 +99,11 @@ class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
               ],
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: AppColors.textPrimary,
+                size: 18,
+              ),
               onPressed: () => Navigator.of(context).maybePop(),
             ),
           ),
@@ -103,14 +112,19 @@ class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
       body: _buildScheduledActionList(_scheduledActions),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Feature coming soon!')),
+          showTopNotice(
+            context: context,
+            message: 'Feature coming soon!',
+            type: TopNoticeType.info,
           );
         },
         backgroundColor: AppColors.primary,
         elevation: 8,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text('Add Schedule', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: const Text(
+          'Add Schedule',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -122,11 +136,19 @@ class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.schedule_rounded, size: 64, color: AppColors.textLight.withValues(alpha: 0.5)),
+            Icon(
+              Icons.schedule_rounded,
+              size: 64,
+              color: AppColors.textLight.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 16),
             const Text(
               'No scheduled actions found.',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 16, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -157,7 +179,8 @@ class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
               onTap: () async {
                 final updatedAction = await showDialog<ScheduledAction>(
                   context: context,
-                  builder: (context) => _EditScheduleDialog(initialAction: action),
+                  builder: (context) =>
+                      _EditScheduleDialog(initialAction: action),
                 );
                 if (updatedAction != null) {
                   setState(() {
@@ -174,7 +197,9 @@ class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
                       width: 52,
                       height: 52,
                       decoration: BoxDecoration(
-                        color: _getColorForType(action.iconType).withValues(alpha: 0.1),
+                        color: _getColorForType(
+                          action.iconType,
+                        ).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -230,21 +255,31 @@ class _MobileSchedulerPageState extends State<MobileSchedulerPage> {
 
   Color _getColorForType(String type) {
     switch (type) {
-      case 'light': return const Color(0xFFFFB236);
-      case 'tv': return const Color(0xFF9D63F4);
-      case 'appliance': return const Color(0xFF22C55E);
-      case 'ac': return const Color(0xFFFF5252);
-      default: return AppColors.primary;
+      case 'light':
+        return const Color(0xFFFFB236);
+      case 'tv':
+        return const Color(0xFF9D63F4);
+      case 'appliance':
+        return const Color(0xFF22C55E);
+      case 'ac':
+        return const Color(0xFFFF5252);
+      default:
+        return AppColors.primary;
     }
   }
 
   IconData _getIconForType(String type) {
     switch (type) {
-      case 'light': return Icons.lightbulb_rounded;
-      case 'tv': return Icons.tv_rounded;
-      case 'appliance': return Icons.kitchen_rounded;
-      case 'ac': return Icons.ac_unit_rounded;
-      default: return Icons.device_hub_rounded;
+      case 'light':
+        return Icons.lightbulb_rounded;
+      case 'tv':
+        return Icons.tv_rounded;
+      case 'appliance':
+        return Icons.kitchen_rounded;
+      case 'ac':
+        return Icons.ac_unit_rounded;
+      default:
+        return Icons.device_hub_rounded;
     }
   }
 }
@@ -275,7 +310,11 @@ class _EditScheduleDialogState extends State<_EditScheduleDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       title: Text(
         'Edit Schedule',
-        style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5, color: AppColors.textPrimary),
+        style: const TextStyle(
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.5,
+          color: AppColors.textPrimary,
+        ),
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -288,13 +327,26 @@ class _EditScheduleDialogState extends State<_EditScheduleDialog> {
             ),
             child: ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Time', style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+              title: const Text(
+                'Time',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
               trailing: Text(
                 _selectedTime.format(context),
-                style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16),
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
               onTap: () async {
-                final picked = await showTimePicker(context: context, initialTime: _selectedTime);
+                final picked = await showTimePicker(
+                  context: context,
+                  initialTime: _selectedTime,
+                );
                 if (picked != null) setState(() => _selectedTime = picked);
               },
             ),
@@ -311,10 +363,20 @@ class _EditScheduleDialogState extends State<_EditScheduleDialog> {
                 value: _selectedAction,
                 isExpanded: true,
                 onChanged: (val) => setState(() => _selectedAction = val!),
-                items: ['Turn On', 'Turn Off'].map((val) => DropdownMenuItem(
-                  value: val,
-                  child: Text(val, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                )).toList(),
+                items: ['Turn On', 'Turn Off']
+                    .map(
+                      (val) => DropdownMenuItem(
+                        value: val,
+                        child: Text(
+                          val,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
             ),
           ),
@@ -323,24 +385,37 @@ class _EditScheduleDialogState extends State<_EditScheduleDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.of(context).pop(ScheduledAction(
-              deviceName: widget.initialAction.deviceName,
-              action: _selectedAction,
-              time: _selectedTime,
-              daysOfWeek: widget.initialAction.daysOfWeek,
-              iconType: widget.initialAction.iconType,
-              isEnabled: widget.initialAction.isEnabled,
-            ));
+            Navigator.of(context).pop(
+              ScheduledAction(
+                deviceName: widget.initialAction.deviceName,
+                action: _selectedAction,
+                time: _selectedTime,
+                daysOfWeek: widget.initialAction.daysOfWeek,
+                iconType: widget.initialAction.iconType,
+                isEnabled: widget.initialAction.isEnabled,
+              ),
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
-          child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          child: const Text(
+            'Save',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
         ),
       ],
     );

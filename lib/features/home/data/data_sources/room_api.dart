@@ -22,4 +22,8 @@ class RoomApi {
     });
     return response as Map<String, dynamic>;
   }
+
+  Future<void> deleteRoom(int roomId) async {
+    await _apiClient.delete('/Room/$roomId');
+  }
 }

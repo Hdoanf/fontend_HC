@@ -31,8 +31,10 @@ class DeviceApi {
   }
 
   Future<void> updateDeviceStatus(int id, bool status) async {
-    await _apiClient.patch('/devices/$id/status', {
-      'status': status,
-    });
+    await _apiClient.patch('/devices/$id/status', {'status': status});
+  }
+
+  Future<void> deleteDevice(int id) async {
+    await _apiClient.delete('/devices/$id');
   }
 }
