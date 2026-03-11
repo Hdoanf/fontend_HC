@@ -6,19 +6,20 @@ import 'core/services/fire_signalr_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
-    await dotenv.load(fileName: ".env.example");
+    await dotenv.load(fileName: ".env");
   } catch (e) {
-    print("Error loading .env file: $e");
+    try {
+      await dotenv.load(fileName: ".env.example");
+    } catch (_) {
+      print("Error loading environment file: $e");
+    }
   }
 
   final container = ProviderContainer();
   // Khởi tạo service báo cháy ngay khi app mở
   container.read(fireSignalRServiceProvider);
-  
-  runApp(UncontrolledProviderScope(
-    container: container,
-    child: const MyApp(),
-  ));
+
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 }
