@@ -1,11 +1,11 @@
 {
-    "name": "thuctap",
-    "short_name": "thuctap",
+    "name": "Smart Home HC",
+    "short_name": "Smart Home HC",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Smart Home HC app for monitoring and controlling your smart home.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
