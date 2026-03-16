@@ -168,8 +168,8 @@ class _SignInFormState extends ConsumerState<SignInForm> {
               const Expanded(
                 child: Divider(thickness: 1, color: AppColors.borderColor),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   "Or",
                   style: TextStyle(

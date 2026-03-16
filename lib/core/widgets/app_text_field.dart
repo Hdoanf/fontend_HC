@@ -15,18 +15,30 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: isDark ? AppColors.desktopCardLight : AppColors.surfaceGray,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? AppColors.desktopBorderColor : AppColors.borderColor,
+          width: 1,
+        ),
       ),
       child: TextField(
         controller: controller,
         obscureText: isPassword,
-        style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: isDark ? AppColors.desktopTextPrimary : AppColors.textPrimary,
+        ),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: AppColors.textLight, fontWeight: FontWeight.w500),
+          hintStyle: TextStyle(
+            color: isDark ? AppColors.desktopTextSecondary : AppColors.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),

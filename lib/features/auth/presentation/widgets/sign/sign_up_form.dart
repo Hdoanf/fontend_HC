@@ -5,7 +5,8 @@ import 'package:thuctap/core/widgets/app_button.dart';
 import 'package:thuctap/core/widgets/app_text_field.dart';
 import 'package:thuctap/core/widgets/top_notice.dart';
 import 'package:thuctap/core/constants/app_colors.dart';
-import 'package:thuctap/features/auth/presentation/providers/auth_providers.dart';
+import 'package:thuctap/core/localization/app_localizations.dart';
+import '../../login_controller.dart';
 
 class SignUpForm extends ConsumerStatefulWidget {
   const SignUpForm({super.key});
@@ -56,9 +57,6 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
 
     setState(() => _isSubmitting = true);
     try {
-      await ref
-          .read(authRepositoryProvider)
-          .signUp(name: name, email: email, password: password);
       if (!mounted) return;
       showTopNotice(
         context: context,
@@ -80,6 +78,8 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(

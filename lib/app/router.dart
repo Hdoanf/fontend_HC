@@ -57,8 +57,8 @@ final GoRouter appRouter = GoRouter(
             final roomData = state.extra as Map<String, dynamic>?;
             return ResponsiveLayout(
               mobile: MobileLocationPage(initialRoomData: roomData),
-              tablet: MobileLocationPage(initialRoomData: roomData),
-              web: MobileLocationPage(initialRoomData: roomData),
+              tablet: const DesktopLocationPage(),
+              web: const DesktopLocationPage(),
             );
           },
         ),

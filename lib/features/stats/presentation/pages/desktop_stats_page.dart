@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:thuctap/core/localization/app_localizations.dart';
+import 'package:thuctap/features/auth/presentation/providers/auth_providers.dart';
+import 'package:thuctap/features/location/presentation/providers/location_providers.dart';
 import '../../../../core/constants/app_colors.dart';
-
-/// ===================== MODELS =====================
 
 enum EnergyFilter { day, week, month }
 
@@ -17,77 +19,105 @@ class EnergyPoint {
   EnergyPoint(this.label, this.value);
 }
 
-/// ===================== PAGE =====================
-
-class StatEnergyPage extends StatefulWidget {
+class StatEnergyPage extends ConsumerStatefulWidget {
   const StatEnergyPage({super.key});
 
   @override
-  State<StatEnergyPage> createState() => _StatEnergyPageState();
+  ConsumerState<StatEnergyPage> createState() => _StatEnergyPageState();
 }
 
-class _StatEnergyPageState extends State<StatEnergyPage> {
+class _StatEnergyPageState extends ConsumerState<StatEnergyPage> {
   EnergyFilter filter = EnergyFilter.week;
+  List<EnergyDevice> devices = [];
+  bool _isLoadingDevices = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadRealDevices());
+  }
+
+  Future<void> _loadRealDevices() async {
+    final selectedHome = ref.read(selectedHomeProvider);
+    if (selectedHome == null) {
+      if (mounted) setState(() => _isLoadingDevices = false);
+      return;
+    }
+
+    final roomApi = ref.read(roomApiProvider);
+    final token = ref.read(authControllerProvider).value?.token ?? '';
+    if (mounted) setState(() => _isLoadingDevices = true);
+    
+    try {
+      final rooms = await roomApi.fetchRooms(homeId: selectedHome.homeId, token: token);
+      List<EnergyDevice> tempDevices = [];
+      
+      // Mock energy data for real devices
+      final mockEnergies = [12.5, 35.2, 22.8, 8.1, 15.4, 10.2, 5.5];
+      int energyIdx = 0;
+
+      for (final room in rooms) {
+        try {
+          final roomDevices = await roomApi.fetchDevicesByRoom(room.roomId, token: token);
+          for (var d in roomDevices) {
+            tempDevices.add(EnergyDevice(
+              name: d.name, 
+              energy: mockEnergies[energyIdx % mockEnergies.length],
+            ));
+            energyIdx++;
+          }
+        } catch (_) {}
+      }
+
+      if (mounted) {
+        setState(() {
+          devices = tempDevices;
+          _isLoadingDevices = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingDevices = false);
+    }
+  }
 
   List<EnergyPoint> get chartData {
     switch (filter) {
       case EnergyFilter.day:
         return [
-          EnergyPoint('0h', 1.2),
-          EnergyPoint('6h', 2.5),
-          EnergyPoint('12h', 3.8),
-          EnergyPoint('18h', 2.9),
-          EnergyPoint('24h', 1.6),
+          EnergyPoint('0h', 1.2), EnergyPoint('6h', 2.5), EnergyPoint('12h', 3.8), EnergyPoint('18h', 2.9), EnergyPoint('24h', 1.6),
         ];
       case EnergyFilter.week:
         return [
-          EnergyPoint('W1', 6),
-          EnergyPoint('W2', 12),
-          EnergyPoint('W3', 18),
-          EnergyPoint('W4', 22),
+          EnergyPoint('W1', 6), EnergyPoint('W2', 12), EnergyPoint('W3', 18), EnergyPoint('W4', 22),
         ];
       case EnergyFilter.month:
-        return List.generate(
-          12,
-          (i) => EnergyPoint('M${i + 1}', (i + 1) * 4),
-        );
+        return List.generate(12, (i) => EnergyPoint('M${i + 1}', (i + 1) * 4.0));
     }
   }
 
-  final List<EnergyDevice> devices = [
-    EnergyDevice(name: 'Living Room Lamp', energy: 12.5),
-    EnergyDevice(name: 'Air Conditioner', energy: 35.2),
-    EnergyDevice(name: 'Kitchen Fridge', energy: 22.8),
-    EnergyDevice(name: 'TV', energy: 8.1),
-    EnergyDevice(name: 'Washing Machine', energy: 15.4),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    ref.listen(selectedHomeProvider, (_, __) => _loadRealDevices());
+    
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Header(
-              filter: filter,
-              onChanged: (f) => setState(() => filter = f),
-            ),
+            _Header(filter: filter, onChanged: (f) => setState(() => filter = f)),
             const SizedBox(height: 32),
             Expanded(
               child: Row(
                 children: [
-                  Expanded(
-                    flex: 4,
-                    child: _EnergyChart(data: chartData),
-                  ),
+                  Expanded(flex: 4, child: _GlassContainer(child: _EnergyChart(data: chartData))),
                   const SizedBox(width: 32),
-                  Expanded(
-                    flex: 2,
-                    child: _DeviceEnergyList(devices: devices),
-                  ),
+                  Expanded(flex: 2, child: _GlassContainer(
+                    child: _isLoadingDevices 
+                      ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                      : _DeviceEnergyList(devices: devices)
+                  )),
                 ],
               ),
             ),
@@ -98,58 +128,120 @@ class _StatEnergyPageState extends State<StatEnergyPage> {
   }
 }
 
-/// ===================== HEADER =====================
+class _GlassContainer extends StatelessWidget {
+  final Widget child;
+  const _GlassContainer({required this.child});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: child,
+    );
+  }
+}
 
 class _Header extends StatelessWidget {
   final EnergyFilter filter;
   final ValueChanged<EnergyFilter> onChanged;
+  const _Header({required this.filter, required this.onChanged});
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Row(
+      children: [
+        Text(l10n.t('Energy Statistics'), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.desktopTextPrimary)),
+        const Spacer(),
+        _FilterToggle(filter: filter, onChanged: onChanged),
+      ],
+    );
+  }
+}
 
-  const _Header({
-    required this.filter,
-    required this.onChanged,
-  });
+class _FilterToggle extends StatelessWidget {
+  final EnergyFilter filter;
+  final ValueChanged<EnergyFilter> onChanged;
+  const _FilterToggle({required this.filter, required this.onChanged});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(16)),
+      child: Row(
+        children: EnergyFilter.values.map((f) {
+          final active = filter == f;
+          return GestureDetector(
+            onTap: () => onChanged(f),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: active ? AppColors.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                f.name.toUpperCase(),
+                style: TextStyle(color: active ? Colors.white : AppColors.desktopTextSecondary, fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class _EnergyChart extends StatelessWidget {
+  final List<EnergyPoint> data;
+  const _EnergyChart({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final l10n = AppLocalizations.of(context);
+    final maxValue = data.isEmpty ? 1.0 : data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Energy Statistics',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5),
-        ),
-        const Spacer(),
-        Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.textPrimary.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+        Text(l10n.t('Energy Usage (kWh)'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.desktopTextPrimary)),
+        const SizedBox(height: 32),
+        Expanded(
           child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _FilterButton(
-                label: 'Day',
-                active: filter == EnergyFilter.day,
-                onTap: () => onChanged(EnergyFilter.day),
-              ),
-              _FilterButton(
-                label: 'Week',
-                active: filter == EnergyFilter.week,
-                onTap: () => onChanged(EnergyFilter.week),
-              ),
-              _FilterButton(
-                label: 'Month',
-                active: filter == EnergyFilter.month,
-                onTap: () => onChanged(EnergyFilter.month),
-              ),
-            ],
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: data.map((e) {
+              return Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(e.value.toStringAsFixed(1), style: const TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Flexible(
+                      child: FractionallySizedBox(
+                        heightFactor: (e.value / maxValue).clamp(0.05, 1.0),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [AppColors.primary, AppColors.primary.withOpacity(0.3)],
+                            ),
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                            boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(e.label, style: const TextStyle(fontSize: 12, color: AppColors.desktopTextSecondary)),
+                  ],
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -157,216 +249,42 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// ===================== FILTER BUTTON =====================
-
-class _FilterButton extends StatelessWidget {
-  final String label;
-  final bool active;
-  final VoidCallback onTap;
-
-  const _FilterButton({
-    required this.label,
-    required this.active,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        decoration: BoxDecoration(
-          color: active ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: active ? [
-            BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))
-          ] : [],
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: active ? Colors.white : AppColors.textSecondary,
-            fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// ===================== ENERGY CHART =====================
-class _EnergyChart extends StatelessWidget {
-  final List<EnergyPoint> data;
-  const _EnergyChart({required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    final maxValue = data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
-
-    const double chartHeight = 400;
-    const double labelHeight = 36;
-    final double barMaxHeight = chartHeight - labelHeight;
-
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(color: AppColors.textPrimary.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 8)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Energy Usage (kWh)',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5),
-          ),
-          const SizedBox(height: 32),
-
-          /// ===== CHART =====
-          SizedBox(
-            height: chartHeight,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                /// ===== Y AXIS =====
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(5, (i) {
-                    final value = (maxValue * (4 - i) / 4).round();
-                    return Text(
-                      value.toString(),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(width: 16),
-
-                /// ===== BARS =====
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: data.map((e) {
-                      final targetHeight = (e.value / maxValue) * barMaxHeight;
-
-                      return Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TweenAnimationBuilder<double>(
-                              tween: Tween(begin: 0, end: targetHeight),
-                              duration: const Duration(milliseconds: 600),
-                              curve: Curves.easeOutCubic,
-                              builder: (context, value, _) {
-                                return Container(
-                                  height: value,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [AppColors.primary, Color(0xFF5D7EFF)],
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter,
-                                    ),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              height: 20,
-                              child: Text(
-                                e.label,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// ===================== DEVICE LIST =====================
-
 class _DeviceEnergyList extends StatelessWidget {
   final List<EnergyDevice> devices;
   const _DeviceEnergyList({required this.devices});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(color: AppColors.textPrimary.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 8)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Devices Top Usage',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary, letterSpacing: -0.5),
-          ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: ListView.separated(
-              physics: const BouncingScrollPhysics(),
-              itemCount: devices.length,
-              separatorBuilder: (_, __) => const Divider(color: AppColors.borderColor, height: 32),
-              itemBuilder: (_, i) {
-                final d = devices[i];
-                return Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.t('Devices'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.desktopTextPrimary)),
+        const SizedBox(height: 24),
+        Expanded(
+          child: devices.isEmpty 
+            ? const Center(child: Text('Chưa có thiết bị nào.', style: TextStyle(color: AppColors.desktopTextSecondary)))
+            : ListView.separated(
+                itemCount: devices.length,
+                separatorBuilder: (_, __) => const Divider(height: 32, color: Colors.white10),
+                itemBuilder: (_, i) {
+                  final d = devices[i];
+                  return Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+                        child: const Icon(Icons.bolt_rounded, color: AppColors.primary, size: 18),
                       ),
-                      child: const Icon(Icons.electrical_services_rounded, color: AppColors.primary, size: 24),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        d.name,
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.textPrimary),
-                      )
-                    ),
-                    Text(
-                      '${d.energy.toStringAsFixed(1)} kWh',
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.primary),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                      const SizedBox(width: 16),
+                      Expanded(child: Text(d.name, style: const TextStyle(color: AppColors.desktopTextPrimary, fontWeight: FontWeight.w500))),
+                      Text('${d.energy.toStringAsFixed(1)} kWh', style: const TextStyle(color: AppColors.desktopTextSecondary, fontWeight: FontWeight.bold)),
+                    ],
+                  );
+                },
+              ),
+        ),
+      ],
     );
   }
 }

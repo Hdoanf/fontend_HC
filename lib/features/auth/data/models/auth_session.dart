@@ -12,4 +12,6 @@ class AuthSession {
   final String userId;
   final String name;
   final String email;
+
+  String get token => accessToken;
 }

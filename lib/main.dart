@@ -17,6 +17,8 @@ void main() async {
     }
   }
 
+  print("API_BASE_URL: ${dotenv.get('API_BASE_URL', fallback: 'Not set')}");
+
   final container = ProviderContainer();
   // Khởi tạo service báo cháy ngay khi app mở
   container.read(fireSignalRServiceProvider);

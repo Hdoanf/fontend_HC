@@ -30,13 +30,13 @@ class AuthApi {
         body: {'email': email, 'password': password},
       );
     } catch (e) {
-      throw AuthException(_networkErrorMessage(e));
+      throw AuthException(_networkErrorMessage(e, uri));
     }
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message =
           _tryReadMessage(response.body) ??
-          'Đăng nhập thất bại (HTTP ${response.statusCode}): ${_compactBody(response.body)}';
+          'Đăng nhập thất bại (HTTP ${response.statusCode}) tại $uri: ${_compactBody(response.body)}';
       throw AuthException(message);
     }
 
@@ -89,13 +89,13 @@ class AuthApi {
         },
       );
     } catch (e) {
-      throw AuthException(_networkErrorMessage(e));
+      throw AuthException(_networkErrorMessage(e, uri));
     }
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message =
           _tryReadMessage(response.body) ??
-          'Đăng ký thất bại (HTTP ${response.statusCode}): ${_compactBody(response.body)}';
+          'Đăng ký thất bại (HTTP ${response.statusCode}) tại $uri: ${_compactBody(response.body)}';
       throw AuthException(message);
     }
   }
@@ -179,15 +179,15 @@ String _compactBody(String body) {
   return '${trimmed.substring(0, 160)}...';
 }
 
-String _networkErrorMessage(Object error) {
+String _networkErrorMessage(Object error, Uri uri) {
   final raw = error.toString();
   if (raw.contains('HandshakeException')) {
-    return 'API đã redirect sang HTTPS nhưng chứng chỉ chưa hợp lệ trên điện thoại.';
+    return 'API ($uri) đã redirect sang HTTPS nhưng chứng chỉ chưa hợp lệ trên điện thoại.';
   }
   if (raw.contains('XMLHttpRequest error')) {
-    return 'Không kết nối được API từ web (thường do CORS hoặc API chưa mở mạng).';
+    return 'Không kết nối được API tại $uri từ web (thường do CORS hoặc API chưa mở mạng).';
   }
-  return 'Lỗi kết nối API: $raw';
+  return 'Lỗi kết nối API tại $uri: $raw';
 }
 
 Future<http.Response> _postJsonWithRedirect({

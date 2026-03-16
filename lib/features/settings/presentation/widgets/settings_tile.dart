@@ -17,15 +17,18 @@ class SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? AppColors.desktopCard : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
+          border: isDark ? Border.all(color: AppColors.desktopBorderColor) : null,
+          boxShadow: isDark ? null : const [
             BoxShadow(color: Colors.black12, blurRadius: 12),
           ],
         ),
@@ -38,20 +41,23 @@ class SettingsTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                          fontSize: 16, 
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? AppColors.desktopTextPrimary : AppColors.textPrimary,
+                      )),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: isDark ? AppColors.desktopTextSecondary : AppColors.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, size: 16),
+            Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? AppColors.desktopTextSecondary : Colors.black),
           ],
         ),
       ),

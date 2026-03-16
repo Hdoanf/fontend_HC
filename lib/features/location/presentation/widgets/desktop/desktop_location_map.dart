@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thuctap/core/localization/app_localizations.dart';
 import 'package:thuctap/features/location/data/models/device_location_model.dart';
 
 class DesktopLocationMap extends StatefulWidget {
@@ -32,6 +33,7 @@ class _DesktopLocationMapState extends State<DesktopLocationMap> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       height: 500,
       decoration: BoxDecoration(
@@ -82,6 +84,7 @@ class _DesktopLocationMapState extends State<DesktopLocationMap> {
             child: CustomPaint(
               painter: DesktopDeviceMapPainter(
                 devices: widget.devices,
+                l10n: l10n,
               ),
             ),
           ),
@@ -105,17 +108,17 @@ class _DesktopLocationMapState extends State<DesktopLocationMap> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Legend',
+                  Text(
+                    l10n.t('Legend'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  _buildLegendItem('On', const Color(0xFF2563EB)),
+                  _buildLegendItem(l10n.t('On'), const Color(0xFF2563EB)),
                   const SizedBox(height: 6),
-                  _buildLegendItem('Off', Colors.grey[400]!),
+                  _buildLegendItem(l10n.t('Off'), Colors.grey[400]!),
                 ],
               ),
             ),
@@ -130,8 +133,8 @@ class _DesktopLocationMapState extends State<DesktopLocationMap> {
                 color: Colors.black54,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Text(
-                'Use mouse wheel to zoom',
+              child: Text(
+                l10n.t('Use mouse wheel to zoom'),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 11,
@@ -168,9 +171,11 @@ class _DesktopLocationMapState extends State<DesktopLocationMap> {
 
 class DesktopDeviceMapPainter extends CustomPainter {
   final List<DeviceLocationModel> devices;
+  final AppLocalizations l10n;
 
   DesktopDeviceMapPainter({
     required this.devices,
+    required this.l10n,
   });
 
   @override
@@ -204,7 +209,7 @@ class DesktopDeviceMapPainter extends CustomPainter {
       // Draw device label
       final labelTextPainter = TextPainter(
         text: TextSpan(
-          text: device.name,
+          text: l10n.t(device.name),
           style: TextStyle(
             color: Colors.black87,
             fontSize: 11,
