@@ -17,12 +17,17 @@ class MyHomesPage extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(29)),
         title: const Text(
           'Add New Home',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
         ),
         content: TextField(
           controller: homeNameController,
+          style: const TextStyle(color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: "Enter home name",
+            hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
             filled: true,
             fillColor: AppColors.background,
             border: OutlineInputBorder(
@@ -37,6 +42,10 @@ class MyHomesPage extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () async {
               if (homeNameController.text.isNotEmpty) {
                 try {
@@ -178,6 +187,7 @@ class MyHomesPage extends ConsumerWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 17,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   subtitle: Text(

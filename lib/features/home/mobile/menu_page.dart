@@ -13,14 +13,30 @@ class MenuPage extends ConsumerWidget {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surfaceLight,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(29)),
-        title: const Text("Logout", style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text("Are you sure you want to sign out?"),
+        title: const Text(
+          "Logout",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        content: const Text(
+          "Are you sure you want to sign out?",
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
           TextButton(
-            onPressed: () => Navigator.pop(context, true), 
-            child: const Text("Logout", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              "Logout",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),

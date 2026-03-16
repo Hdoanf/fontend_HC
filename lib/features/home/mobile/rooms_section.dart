@@ -30,12 +30,17 @@ class _RoomsSectionState extends ConsumerState<RoomsSection> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(29)),
         title: const Text(
           'Create Your Home',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
         ),
         content: TextField(
           controller: homeNameController,
+          style: const TextStyle(color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: "Home Name",
+            hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
             filled: true,
             fillColor: AppColors.background,
             border: OutlineInputBorder(
@@ -97,15 +102,21 @@ class _RoomsSectionState extends ConsumerState<RoomsSection> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(29)),
         title: const Text(
           'Add New Room',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameCtrl,
+              style: const TextStyle(color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: "Room Name",
+                hintStyle:
+                    TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
                 filled: true,
                 fillColor: AppColors.background,
                 border: OutlineInputBorder(
@@ -117,8 +128,11 @@ class _RoomsSectionState extends ConsumerState<RoomsSection> {
             const SizedBox(height: 12),
             TextField(
               controller: descCtrl,
+              style: const TextStyle(color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: "Description",
+                hintStyle:
+                    TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
                 filled: true,
                 fillColor: AppColors.background,
                 border: OutlineInputBorder(
@@ -192,9 +206,15 @@ class _RoomsSectionState extends ConsumerState<RoomsSection> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Text(
           'Xóa phòng',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
         ),
-        content: Text('Bạn có chắc muốn xóa "$roomName"?'),
+        content: Text(
+          'Bạn có chắc muốn xóa "$roomName"?',
+          style: const TextStyle(color: AppColors.textPrimary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),

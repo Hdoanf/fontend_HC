@@ -16,7 +16,9 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'SmartHome Pro',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.light,
       routerConfig: appRouter,
       locale: locale,
       supportedLocales: AppLocalizations.supportedLocales,

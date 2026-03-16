@@ -75,9 +75,15 @@ class _MobileLocationPageState extends ConsumerState<MobileLocationPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Text(
           'Xóa phòng',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
         ),
-        content: Text('Bạn có chắc muốn xóa "$roomName"?'),
+        content: Text(
+          'Bạn có chắc muốn xóa "$roomName"?',
+          style: const TextStyle(color: AppColors.textPrimary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -128,9 +134,15 @@ class _MobileLocationPageState extends ConsumerState<MobileLocationPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Text(
           'Xóa thiết bị',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
         ),
-        content: Text('Bạn có chắc muốn xóa "$deviceName"?'),
+        content: Text(
+          'Bạn có chắc muốn xóa "$deviceName"?',
+          style: const TextStyle(color: AppColors.textPrimary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -182,15 +194,22 @@ class _MobileLocationPageState extends ConsumerState<MobileLocationPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(29)),
         title: const Text(
           'Add New Device',
-          style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+            color: AppColors.textPrimary,
+          ),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameCtrl,
+              style: const TextStyle(color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: "Device Name",
+                hintStyle:
+                    TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
                 filled: true,
                 fillColor: AppColors.background,
                 border: OutlineInputBorder(
@@ -202,8 +221,11 @@ class _MobileLocationPageState extends ConsumerState<MobileLocationPage> {
             const SizedBox(height: 12),
             TextField(
               controller: typeCtrl,
+              style: const TextStyle(color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: "Type (fan, light...)",
+                hintStyle:
+                    TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
                 filled: true,
                 fillColor: AppColors.background,
                 border: OutlineInputBorder(
