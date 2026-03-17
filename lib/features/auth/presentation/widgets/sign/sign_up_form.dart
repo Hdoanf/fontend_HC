@@ -57,13 +57,29 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
 
     setState(() => _isSubmitting = true);
     try {
-      if (!mounted) return;
-      showTopNotice(
-        context: context,
-        message: 'Đăng ký thành công, mời đăng nhập',
-        type: TopNoticeType.success,
+      final success = await ref.read(authControllerProvider.notifier).signUp(
+        name: name,
+        email: email,
+        password: password,
       );
-      context.go('/sign-in');
+
+      if (!mounted) return;
+
+      if (success) {
+        showTopNotice(
+          context: context,
+          message: 'Đăng ký và đăng nhập thành công!',
+          type: TopNoticeType.success,
+        );
+        context.go('/');
+      } else {
+        final state = ref.read(authControllerProvider);
+        showTopNotice(
+          context: context,
+          message: state.error?.toString() ?? 'Đăng ký thất bại',
+          type: TopNoticeType.error,
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       showTopNotice(

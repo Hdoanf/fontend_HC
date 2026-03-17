@@ -35,6 +35,11 @@ class AuthController extends AsyncNotifier<AuthSession?> {
     }
 
     final loginRes = await AsyncValue.guard(() => ref.read(authRepositoryProvider).signIn(email: email, password: password));
+    if (loginRes.hasError) {
+      state = AsyncValue.error(loginRes.error!, loginRes.stackTrace!);
+      return false;
+    }
+
     if (loginRes.hasValue && loginRes.value != null) {
       ref.read(apiClientProvider).setToken(loginRes.value!.accessToken);
       try {
