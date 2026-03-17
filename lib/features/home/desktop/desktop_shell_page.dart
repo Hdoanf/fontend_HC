@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:thuctap/features/fire_alert/data/fire_alert_service.dart';
+import 'package:thuctap/core/services/fire_signalr_service.dart';
 import 'package:thuctap/features/fire_alert/presentation/fire_alert_dialog.dart';
 import 'package:thuctap/features/fire_alert/presentation/fire_alert_controller.dart';
 import 'desktop_sidebar.dart';
@@ -25,8 +25,9 @@ class _DesktopShellPageState extends ConsumerState<DesktopShellPage> {
     final fireState = ref.watch(fireAlertControllerProvider);
 
     // Listen for SignalR Fire Alerts
-    ref.listen<AsyncValue<double>>(fireAlertStreamProvider, (prev, next) {
-      next.whenData((temperature) {
+    ref.listen<AsyncValue<(String, double)>>(fireAlertStreamProvider, (prev, next) {
+      next.whenData((data) {
+        final (deviceId, temperature) = data;
         if (!_isDialogOpen) {
           _isDialogOpen = true;
           showDialog(
@@ -35,7 +36,7 @@ class _DesktopShellPageState extends ConsumerState<DesktopShellPage> {
             builder: (context) => FireAlertDialog(
               temperature: temperature,
               onClose: () {
-                ref.read(fireAlertServiceProvider).stopAlarm();
+                ref.read(fireSignalRServiceProvider).stopAlarm();
                 Navigator.of(context).pop();
                 _isDialogOpen = false;
               },

@@ -36,20 +36,21 @@ class AuthApi {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message =
           _tryReadMessage(response.body) ??
-          'Đăng nhập thất bại (HTTP ${response.statusCode}) tại $uri: ${_compactBody(response.body)}';
+          'Đăng nhập thất bại (HTTP ${response.statusCode})';
       throw AuthException(message);
     }
 
-    final payload = jsonDecode(response.body) as Map<String, dynamic>;
-    final token = payload['token'] as String?;
+    final payload = _decodePayload(response.body);
+    final token = (payload['token'] ?? payload['accessToken']) as String?;
     final name = payload['name'] as String?;
+    final emailVal = payload['email'] as String? ?? email;
 
     return AuthSession(
       accessToken: token ?? '',
-      refreshToken: '',
-      userId: '',
-      name: name ?? email.split('@').first,
-      email: email,
+      refreshToken: (payload['refreshToken'] as String?) ?? '',
+      userId: (payload['userId'] ?? payload['id'] ?? '').toString(),
+      name: name ?? emailVal.split('@').first,
+      email: emailVal,
     );
   }
 

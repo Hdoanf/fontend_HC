@@ -76,7 +76,8 @@ class MobileShellPage extends ConsumerWidget {
     // GLOBAL FIRE LISTENER
     ref.listen(fireAlertStreamProvider, (previous, next) {
       if (next.hasValue) {
-        _showGlobalFireAlert(context, ref, next.value!);
+        final (deviceId, temp) = next.value!;
+        _showGlobalFireAlert(context, ref, temp);
       }
     });
 

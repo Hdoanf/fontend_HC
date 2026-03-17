@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'app/app.dart';
 import 'core/services/fire_signalr_service.dart';
+import 'features/fire_alert/presentation/providers/fire_sensor_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,8 +21,9 @@ void main() async {
   print("API_BASE_URL: ${dotenv.get('API_BASE_URL', fallback: 'Not set')}");
 
   final container = ProviderContainer();
-  // Khởi tạo service báo cháy ngay khi app mở
+  // Khởi tạo các service báo cháy ngay khi app mở
   container.read(fireSignalRServiceProvider);
+  container.read(fireSensorProvider);
 
   runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 }
