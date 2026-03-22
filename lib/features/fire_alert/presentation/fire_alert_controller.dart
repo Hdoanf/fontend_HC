@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/providers.dart';
 import '../data/fire_alert_repository.dart';
 import '../domain/fire_alert_state.dart';
 
 final fireAlertRepositoryProvider = Provider<FireAlertRepository>(
-  (ref) => FireAlertRepository(),
+  (ref) => FireAlertRepository(ref.read(apiClientProvider)),
 );
 
 final fireAlertControllerProvider =

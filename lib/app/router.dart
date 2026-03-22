@@ -11,6 +11,8 @@ import 'package:thuctap/features/stats/presentation/pages/mobile_stats_page.dart
 import 'package:thuctap/features/settings/presentation/pages/mobile_settings_page.dart';
 import 'package:thuctap/features/auth/auth_routes.dart';
 import 'package:thuctap/features/auth/presentation/login_screen.dart';
+import 'package:thuctap/features/onboarding/presentation/onboarding_page.dart';
+import 'package:thuctap/features/onboarding/presentation/splash_page.dart';
 import 'package:thuctap/features/device/device_routes.dart';
 import 'package:thuctap/features/device/presentation/device_screen.dart';
 import 'package:thuctap/features/fire_alert/fire_alert_routes.dart';
@@ -23,8 +25,17 @@ import '../features/home/presentation/pages/my_homes_page.dart';
 import '../core/utils/responsive_layout.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: AuthRoutes.signIn,
+  initialLocation: AuthRoutes.splash,
   routes: [
+    GoRoute(
+      path: AuthRoutes.splash,
+      builder: (context, state) => const SplashPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.onboarding,
+      builder: (context, state) => const OnboardingPage(),
+    ),
+
     /// AUTH (không shell)
     GoRoute(
       path: AuthRoutes.signIn,
@@ -46,7 +57,10 @@ final GoRouter appRouter = GoRouter(
       },
       routes: [
         GoRoute(path: '/', builder: (context, state) => const HomePage()),
-        GoRoute(path: '/my-homes', builder: (context, state) => const MyHomesPage()),
+        GoRoute(
+          path: '/my-homes',
+          builder: (context, state) => const MyHomesPage(),
+        ),
         GoRoute(
           path: DeviceRoutes.devices,
           builder: (context, state) => const DeviceScreen(),

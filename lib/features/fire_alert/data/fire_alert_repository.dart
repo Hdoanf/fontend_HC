@@ -1,12 +1,28 @@
 import 'dart:async';
 import 'dart:math';
 
+import '../../../core/services/api_client.dart';
 import '../domain/fire_alert_state.dart';
+import 'models/fire_sensor_data_model.dart';
 
 class FireAlertRepository {
+  final ApiClient _apiClient;
   final Random _random = Random();
 
+  FireAlertRepository(this._apiClient);
+
+  Future<List<FireSensorDataModel>> getSensorDataByDeviceId(int deviceId) async {
+    try {
+      final List<dynamic> response = await _apiClient.get('/sensors/by-device/$deviceId');
+      return response.map((json) => FireSensorDataModel.fromJson(json as Map<String, dynamic>)).toList();
+    } catch (e) {
+      print('Error fetching sensor data for device $deviceId: $e');
+      rethrow;
+    }
+  }
+
   Future<List<FireEvent>> getInitialEvents() async {
+    // ... rest of code (existing mock methods)
     await Future<void>.delayed(const Duration(milliseconds: 300));
     final now = DateTime.now();
     return <FireEvent>[

@@ -7,6 +7,7 @@ import 'package:thuctap/features/home/presentation/providers/home_providers.dart
 import 'package:thuctap/features/device/presentation/providers/device_providers.dart';
 import 'package:thuctap/core/widgets/top_notice.dart';
 import '../../../../core/constants/app_colors.dart';
+import 'widgets/fire_sensor_history_dialog.dart';
 
 class FireAlertScreen extends ConsumerWidget {
   const FireAlertScreen({super.key});
@@ -213,40 +214,52 @@ class _FireSensorCard extends StatelessWidget {
     final bool isAlert = sensor.isAlert;
     final Color color = isAlert ? Colors.red : (sensor.temperature >= 50 ? Colors.orange : Colors.green);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: () => showDialog(
+          context: context,
+          builder: (context) => FireSensorHistoryDialog(
+            deviceId: sensor.deviceId,
+            sensorName: sensor.name,
+          ),
+        ),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.08), blurRadius: 15, offset: const Offset(0, 6))],
-        border: Border.all(color: color.withValues(alpha: 0.15), width: 1.5),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
-            child: Icon(isAlert ? Icons.local_fire_department_rounded : Icons.thermostat_rounded, color: color, size: 28),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [BoxShadow(color: color.withValues(alpha: 0.08), blurRadius: 15, offset: const Offset(0, 6))],
+            border: Border.all(color: color.withValues(alpha: 0.15), width: 1.5),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(sensor.name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.textPrimary)),
-                const SizedBox(height: 2),
-                Text("Device ID: ${sensor.deviceId}", style: TextStyle(color: Colors.grey.shade500, fontSize: 12, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 4),
-                Text(
-                  isAlert ? "NGUY HIỂM: PHÁT HIỆN CHÁY!" : (sensor.temperature >= 50 ? "Cảnh báo: Nhiệt độ cao" : "Trạng thái: An toàn"),
-                  style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+                child: Icon(isAlert ? Icons.local_fire_department_rounded : Icons.thermostat_rounded, color: color, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(sensor.name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.textPrimary)),
+                    const SizedBox(height: 2),
+                    Text("Device ID: ${sensor.deviceId}", style: TextStyle(color: Colors.grey.shade500, fontSize: 12, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 4),
+                    Text(
+                      isAlert ? "NGUY HIỂM: PHÁT HIỆN CHÁY!" : (sensor.temperature >= 50 ? "Cảnh báo: Nhiệt độ cao" : "Trạng thái: An toàn"),
+                      style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Text("${sensor.temperature.toStringAsFixed(1)}°C", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
+            ],
           ),
-          Text("${sensor.temperature.toStringAsFixed(1)}°C", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
-        ],
+        ),
       ),
     );
   }
