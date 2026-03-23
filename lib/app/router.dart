@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:thuctap/features/scheduler/presentation/pages/device_scheduler_page.dart';
 import 'package:thuctap/features/scheduler/presentation/pages/mobile_scheduler_page.dart';
