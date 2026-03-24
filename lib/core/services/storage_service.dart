@@ -1,17 +1,20 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 class StorageService {
   const StorageService();
 
-  static final Map<String, String> _memory = <String, String>{};
-
   Future<void> write(String key, String value) async {
-    _memory[key] = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, value);
   }
 
   Future<String?> read(String key) async {
-    return _memory[key];
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(key);
   }
 
   Future<void> delete(String key) async {
-    _memory.remove(key);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(key);
   }
 }

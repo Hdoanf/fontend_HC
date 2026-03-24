@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
 import 'package:thuctap/core/widgets/webcam_mjpeg_view.dart';
 import 'package:thuctap/core/constants/app_colors.dart';
@@ -87,7 +88,13 @@ class _MobileDevicesPageState extends State<MobileDevicesPage> {
             ),
             child: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
-              onPressed: () => Navigator.of(context).maybePop(),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/');
+                }
+              },
             ),
           ),
         ),

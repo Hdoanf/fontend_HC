@@ -94,8 +94,6 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(

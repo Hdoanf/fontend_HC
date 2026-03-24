@@ -1,20 +1,24 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../auth/auth_routes.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../auth/presentation/login_controller.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
+  ConsumerState<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
+class _SplashPageState extends ConsumerState<SplashPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  bool _animationFinished = false;
 
   @override
   void initState() {
@@ -36,9 +40,35 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
     Timer(const Duration(seconds: 3), () {
       if (mounted) {
-        context.go(AuthRoutes.onboarding);
+        setState(() {
+          _animationFinished = true;
+        });
+        _checkAndNavigate();
       }
     });
+  }
+
+  void _checkAndNavigate() async {
+    if (!_animationFinished) return;
+
+    final authState = ref.read(authControllerProvider);
+    if (authState.isLoading) return; // Wait for it to finish loading
+
+    final prefs = await SharedPreferences.getInstance();
+    final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+
+    if (!mounted) return;
+
+    if (authState.valueOrNull != null) {
+      // User is logged in
+      context.go('/');
+    } else if (hasSeenOnboarding) {
+      // User has seen onboarding but not logged in
+      context.go(AuthRoutes.signIn);
+    } else {
+      // First time
+      context.go(AuthRoutes.onboarding);
+    }
   }
 
   @override
@@ -49,6 +79,13 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    // Listen to auth state changes to navigate once loaded if animation is already finished
+    ref.listen(authControllerProvider, (previous, next) {
+      if (!next.isLoading && _animationFinished) {
+        _checkAndNavigate();
+      }
+    });
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
